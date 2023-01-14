@@ -1,0 +1,4 @@
+packages: .
+allow-newer: all
+optimization: 2
+benchmarks: True

@@ -1,0 +1,12 @@
+{
+  "haskell.toolchain": {
+    "hls": null,
+    "stack": null,
+    "cabal": null
+  },
+  "[haskell]": {
+    "editor.defaultFormatter": "sjurmillidahl.ormolu-vscode"
+  },
+  "ormolu.path": "fourmolu",
+  "ormolu.args": ["--stdin-input-file", "."]
+}
