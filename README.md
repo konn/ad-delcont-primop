@@ -71,8 +71,7 @@ $$
 #### Complex
 
 $$
- (\tanh (e^{y + z ^ 2} \cosh x) + x ^ 2) ^ 3
- - (x (z ^ 2 - 1) \cos x + y)^{2z} e^{x  \sin (x + yzx + 1)}
+  (\tanh (e^{y + z ^ 2} \cosh x) + x ^ 2) ^ 3 - (x (z ^ 2 - 1) \cos x + y)^{2z} e^{x  \sin (x + yzx + 1)}
 $$
 
 ![1.5x fast](./bench-results/trivariate/01.svg)
