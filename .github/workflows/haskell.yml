@@ -48,7 +48,9 @@ jobs:
         BIN_DIR=bins
         mkdir -p ${BIN_DIR}
         xz -d cabal-plan-0.6.2.0-x86_64-linux.xz
-        ./cabal-plan list-bins | grep ad-delcont-primop | awk '{ print $2 }' | while read -r BIN; do
+        ./cabal-plan-0.6.2.0-x86_64-linux list-bins \
+          --hide-global --hide-setup --hide-builtin \
+          | grep ad-delcont-primop | awk '{ print $2 }' | while read -r BIN; do
           strip "${BIN}"
           cp "${BIN}" "${BIN_DIR}/"
         done
