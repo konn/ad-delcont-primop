@@ -8,6 +8,7 @@ import Data.Data.Lens
 import Helpers
 import Language.Haskell.TH
 import Linear
+import qualified Numeric.AD as AD
 import qualified Numeric.AD.DelCont as MTL
 import qualified Numeric.AD.DelCont.Native as PrimOp
 import Test.Tasty.Bench
@@ -24,7 +25,13 @@ mkDiffBench func = do
             let mtl = snd (MTL.rad1 $(func) x)
                 primop = PrimOp.diff ($func :: PrimOp.AD s Double -> PrimOp.AD s Double) x
              in V1 mtl ==~ V1 primop
+      , testProperty "ad and primops returns almost the same answer" $
+          \(x :: Double) ->
+            let ad = AD.diff $(func) x
+                primop = PrimOp.diff ($func :: PrimOp.AD s Double -> PrimOp.AD s Double) x
+             in V1 ad ==~ V1 primop
       , bench "transformers" $ nf (snd . MTL.rad1 $func) (42.0 :: Double)
+      , bench "ad" $ nf (AD.diff $func) (42.0 :: Double)
       , bench "primops" $ nf (PrimOp.diff ($func :: PrimOp.AD s Double -> PrimOp.AD s Double)) (42.0 :: Double)
       ]
     |]
@@ -50,7 +57,16 @@ mkGradBench func arg = do
                     ($func :: _ (PrimOp.AD s Double) -> PrimOp.AD s Double)
                     x
              in mtl ==~ primop
+      , testProperty "ad and primops returns almost the same answer" $
+          \(x :: _ Double) ->
+            let ad = AD.grad $(func) x
+                primop =
+                  PrimOp.grad
+                    ($func :: _ (PrimOp.AD s Double) -> PrimOp.AD s Double)
+                    x
+             in ad ==~ primop
       , bench "transformers" $ nf (snd . MTL.grad $func) ($arg :: _ Double)
+      , bench "ad" $ nf (AD.grad $func) ($(arg) :: _ Double)
       , bench "primops" $ nf (PrimOp.grad ($func :: _ (PrimOp.AD s Double) -> PrimOp.AD s Double)) ($(arg) :: _ Double)
       ]
     |]

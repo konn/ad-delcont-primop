@@ -81,6 +81,7 @@ benchmark ad-delcont-primop-bench
   hs-source-dirs: bench
   ghc-options:    "-with-rtsopts=-A32m -T"
   build-depends:
+    , ad
     , ad-delcont
     , ad-delcont-primop
     , lens
@@ -90,5 +91,4 @@ benchmark ad-delcont-primop-bench
     , tasty-quickcheck
     , template-haskell
 
--- , ad
 -- , backprop
