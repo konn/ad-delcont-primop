@@ -116,8 +116,10 @@ $$
   + See `Numeric.AD.DelCont.MultiPrompt` for PoC
   + We can abolish refs except for the ones for the outermost primitive variables
     * perhaps coroutine-like hack can eliminateThis
-  + This implementation, however, is not as efficient as STRef-based in terms of both time and space
+  + This implementation, however, is not as efficient as STRef-based in terms of time
     * This is because each continuation allocates different values rather than single mutable variable
+    * But still in some cases, allocation can be slightly reduced by this approach (need confirmation)
+    * In particular, as the # of variable increases, the time overhead seems decaying and allocation becomes slightly fewer
 - Avoids (indirect) references at any costs!
 - ~~Remove `Ref`s from constants~~
   + This increases both runtime and allocation by twice (see [the benchmark log][const-ref-log])
