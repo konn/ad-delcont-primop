@@ -36,6 +36,9 @@ jobs:
         --with-compiler ghc-9.6.0.20230111
         --enable-optimisation 2
         --enable-benchmarks --enable-tests
+        --index-state 2023-01-14T16:11:16Z
+
+        cabal update
     - name: Build
       run: cabal build
     - name: Collect Binaries
