@@ -33,7 +33,7 @@ jobs:
         ghcup install cabal 3.8.1.0
     - name: Configure
       run: >
-        cabal configure --jobs '$ncpus'
+        cabal configure --jobs $'$ncpus'
         --with-compiler ghc-9.6.0.20230111
         --enable-optimisation=2
         --enable-benchmarks --enable-tests
@@ -43,23 +43,7 @@ jobs:
     - name: Build
       run: cabal build
     - name: Collect Binaries
-      run: |
-        set -euxo pipefail
-        wget -O- https://github.com/haskell-hvr/cabal-plan/releases/download/v0.6.2.0/cabal-plan-0.6.2.0-x86_64-linux.xz \
-          | xz -d - > cabal-plan
-        chmod +x cabal-plan
-        BIN_DIR=bins
-        mkdir -p ${BIN_DIR}/bin
-        ./cabal-plan list-bins  | \
-          grep -e :test: -e :bench: | awk '{ print $2 }' | \
-          while read -r FILE; do basename "${FILE}"; done > "${BIN_DIR}/bench.txt"
-        
-        ./cabal-plan list-bins \
-          | grep ad-delcont-primop | awk '{ print $2 }' | while read -r BIN; do
-          strip "${BIN}"
-          cp "${BIN}" "${BIN_DIR}/bin/"
-        done
-        tar -cf "${{ env.ARTIFACT }}" --use-compress-program="zstdmt -9"  "${BIN_DIR}"
+      run: ./scripts/collect-bins.sh "${{ env.ARTIFACT }}"
     - name: Upload Artifact
       uses: actions/upload-artifact@v3
       with:
