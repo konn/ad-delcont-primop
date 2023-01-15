@@ -21,7 +21,6 @@ That is, it reimplements [`ad-delcont`][ad-delcont], which translates Scala impl
 - `primop`: our generic implementation.
 - `primop/double`: our implementation specialised for `Double`.
 
-
 ### Univariate Differentiation
 
 #### Identity Function: $f(x) = x$
@@ -46,15 +45,15 @@ That is, it reimplements [`ad-delcont`][ad-delcont], which translates Scala impl
 
 ![we are 4x faster!](./bench-results/bivariate/01.svg)
 
-### Exponentials: $f(x, y) = y e^{x^2 + y}$
+#### Exponentials: $f(x, y) = y e^{x^2 + y}$
 
 ![still 4x faster!](./bench-results/bivariate/02.svg)
 
-### Exponentials and Trigonometrics: $f(x, y) = (x \cos x + y)^2 e^{x \sin (x + y^2 + 1)}$
+#### Exponentials and Trigonometrics: $f(x, y) = (x \cos x + y)^2 e^{x \sin (x + y^2 + 1)}$
 
 ![twice as fast](./bench-results/bivariate/03.svg)
 
-### Complex formula
+#### Complex formula
 
 $$
 f(x, y) = (\tanh (e^y  \cosh x) + x ^ 2) ^ 3 - (x \cos x + y) ^ 2 e^{x \sin (x + y ^2 + 1)}
@@ -68,7 +67,7 @@ $$
 
 ![10x fast](./bench-results/trivariate/00.svg)
 
-### Complex
+#### Complex
 
 $$
  (\tanh (e^{y + z ^ 2} \cosh x) + x ^ 2) ^ 3
@@ -110,8 +109,6 @@ $$
 $$
 
 ![almost as fast](./bench-results/4-ary/04.svg)
-
-
 
 ## TODOs
 
