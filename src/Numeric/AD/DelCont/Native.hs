@@ -116,7 +116,7 @@ instance (Fractional a, a ~ b) => Fractional (AD' s a b) where
   {-# INLINE fromRational #-}
   recip = op1 $ \x -> (recip x, negate . (/ (x * x)))
   {-# INLINE recip #-}
-  (/) = op2 $ \x y -> (x / y, (/ y), (* (x / (y * y))))
+  (/) = op2 $ \x y -> (x / y, (/ y), (* (-x / (y * y))))
   {-# INLINE (/) #-}
 
 instance (Floating a, a ~ b) => Floating (AD' s a b) where
