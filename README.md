@@ -116,8 +116,10 @@ $$
 - Explore more fine-grained use of delcont
 - Avoids (indirect) references at any costs!
 - ~~Remove `Ref`s from constants~~
-  + This increases both runtime and allocation by twice (see https://github.com/konn/ad-delcont-primop/actions/runs/3924787010/jobs/6709300040)
+  + This increases both runtime and allocation by twice (see [the benchmark log][const-ref-log])
   + Branching overhead outweighs
+
+[const-ref-log]: https://github.com/konn/ad-delcont-primop/actions/runs/3924787010/jobs/6709300040
 
 ## References
 
