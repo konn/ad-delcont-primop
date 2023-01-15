@@ -1,0 +1,7 @@
+Name,Mean (ps),2*Stdev (ps),Allocated,Copied,Peak Memory
+All.bivariate.(((x * cos x) + y) ^ 2) * exp (x * sin ((x + (y * y)) + 1)).transformers,3463554,183056,6112,0,35651584
+All.bivariate.(((x * cos x) + y) ^ 2) * exp (x * sin ((x + (y * y)) + 1)).ad,3453413,330944,5685,0,35651584
+All.bivariate.(((x * cos x) + y) ^ 2) * exp (x * sin ((x + (y * y)) + 1)).ad/double,2920374,200230,6907,0,35651584
+All.bivariate.(((x * cos x) + y) ^ 2) * exp (x * sin ((x + (y * y)) + 1)).backprop,4891715,210454,14126,0,35651584
+All.bivariate.(((x * cos x) + y) ^ 2) * exp (x * sin ((x + (y * y)) + 1)).primops,1612872,83546,3462,0,35651584
+All.bivariate.(((x * cos x) + y) ^ 2) * exp (x * sin ((x + (y * y)) + 1)).primops/double,1078283,100002,3455,0,35651584

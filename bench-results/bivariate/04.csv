@@ -1,0 +1,7 @@
+Name,Mean (ps),2*Stdev (ps),Allocated,Copied,Peak Memory
+All.bivariate.((tanh (exp y * cosh x) + (x ^ 2)) ^ 3) - ((((x * cos x) + y) ^ 2) * exp (x * sin ((x + (y * y)) + 1))).transformers,8592326,457082,13852,1,35651584
+All.bivariate.((tanh (exp y * cosh x) + (x ^ 2)) ^ 3) - ((((x * cos x) + y) ^ 2) * exp (x * sin ((x + (y * y)) + 1))).ad,5293398,413890,9719,0,35651584
+All.bivariate.((tanh (exp y * cosh x) + (x ^ 2)) ^ 3) - ((((x * cos x) + y) ^ 2) * exp (x * sin ((x + (y * y)) + 1))).ad/double,4217460,341622,9728,0,35651584
+All.bivariate.((tanh (exp y * cosh x) + (x ^ 2)) ^ 3) - ((((x * cos x) + y) ^ 2) * exp (x * sin ((x + (y * y)) + 1))).backprop,8115756,766006,19430,0,35651584
+All.bivariate.((tanh (exp y * cosh x) + (x ^ 2)) ^ 3) - ((((x * cos x) + y) ^ 2) * exp (x * sin ((x + (y * y)) + 1))).primops,3965700,363392,9757,0,35651584
+All.bivariate.((tanh (exp y * cosh x) + (x ^ 2)) ^ 3) - ((((x * cos x) + y) ^ 2) * exp (x * sin ((x + (y * y)) + 1))).primops/double,2686297,184246,8925,0,35651584

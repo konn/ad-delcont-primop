@@ -1,0 +1,7 @@
+Name,Mean (ps),2*Stdev (ps),Allocated,Copied,Peak Memory
+All.univariate.x * exp ((x * x) + 1).transformers,1110589,50958,1732,0,35651584
+All.univariate.x * exp ((x * x) + 1).ad,448530,26016,762,0,35651584
+All.univariate.x * exp ((x * x) + 1).ad/double,36002,2582,44,0,35651584
+All.univariate.x * exp ((x * x) + 1).backprop,1632551,92848,5056,0,35651584
+All.univariate.x * exp ((x * x) + 1).primops,454698,43528,1019,0,35651584
+All.univariate.x * exp ((x * x) + 1).primops/Double,372191,33330,1118,0,35651584

@@ -1,0 +1,7 @@
+Name,Mean (ps),2*Stdev (ps),Allocated,Copied,Peak Memory
+All.bivariate.x * y.transformers,894223,62966,1221,0,35651584
+All.bivariate.x * y.ad,1405563,97054,3449,0,35651584
+All.bivariate.x * y.ad/double,1456972,110334,3446,0,35651584
+All.bivariate.x * y.backprop,1376632,82342,4054,0,35651584
+All.bivariate.x * y.primops,164905,14772,382,0,35651584
+All.bivariate.x * y.primops/double,104881,6444,406,0,35651584

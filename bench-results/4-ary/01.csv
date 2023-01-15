@@ -1,0 +1,7 @@
+Name,Mean (ps),2*Stdev (ps),Allocated,Copied,Peak Memory
+All.4-ary.((x + w) ^ 4) * exp (x + (cos ((y ^ 2) * sin z) * w)).transformers,4145970,210984,6930,0,36700160
+All.4-ary.((x + w) ^ 4) * exp (x + (cos ((y ^ 2) * sin z) * w)).ad,4312232,191440,8944,0,36700160
+All.4-ary.((x + w) ^ 4) * exp (x + (cos ((y ^ 2) * sin z) * w)).ad/double,3937829,380338,8116,0,36700160
+All.4-ary.((x + w) ^ 4) * exp (x + (cos ((y ^ 2) * sin z) * w)).backprop,6035544,338052,16210,0,36700160
+All.4-ary.((x + w) ^ 4) * exp (x + (cos ((y ^ 2) * sin z) * w)).primops,1750944,93340,4464,0,36700160
+All.4-ary.((x + w) ^ 4) * exp (x + (cos ((y ^ 2) * sin z) * w)).primops/double,1136222,81970,4458,0,36700160

@@ -1,0 +1,7 @@
+Name,Mean (ps),2*Stdev (ps),Allocated,Copied,Peak Memory
+All.trivariate.((tanh (exp (y + (z ^ 2)) * cosh x) + (x ^ 2)) ^ 3) - (((((x * ((z ^ 2) - 1)) * cos x) + y) ** (2 * z)) * exp (x * sin ((x + ((y * z) * x)) + 1))).transformers,11073300,732858,16286,2,36700160
+All.trivariate.((tanh (exp (y + (z ^ 2)) * cosh x) + (x ^ 2)) ^ 3) - (((((x * ((z ^ 2) - 1)) * cos x) + y) ** (2 * z)) * exp (x * sin ((x + ((y * z) * x)) + 1))).ad,7747272,418400,13796,0,36700160
+All.trivariate.((tanh (exp (y + (z ^ 2)) * cosh x) + (x ^ 2)) ^ 3) - (((((x * ((z ^ 2) - 1)) * cos x) + y) ** (2 * z)) * exp (x * sin ((x + ((y * z) * x)) + 1))).ad/double,6097092,383046,13762,0,36700160
+All.trivariate.((tanh (exp (y + (z ^ 2)) * cosh x) + (x ^ 2)) ^ 3) - (((((x * ((z ^ 2) - 1)) * cos x) + y) ** (2 * z)) * exp (x * sin ((x + ((y * z) * x)) + 1))).backprop,12737182,681628,32377,0,36700160
+All.trivariate.((tanh (exp (y + (z ^ 2)) * cosh x) + (x ^ 2)) ^ 3) - (((((x * ((z ^ 2) - 1)) * cos x) + y) ** (2 * z)) * exp (x * sin ((x + ((y * z) * x)) + 1))).primops,5459208,428368,13741,0,36700160
+All.trivariate.((tanh (exp (y + (z ^ 2)) * cosh x) + (x ^ 2)) ^ 3) - (((((x * ((z ^ 2) - 1)) * cos x) + y) ** (2 * z)) * exp (x * sin ((x + ((y * z) * x)) + 1))).primops/double,3665844,351240,13731,0,36700160

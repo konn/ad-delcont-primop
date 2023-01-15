@@ -1,0 +1,7 @@
+Name,Mean (ps),2*Stdev (ps),Allocated,Copied,Peak Memory
+All.4-ary.((x * y) * z) * w.transformers,1628328,103048,3064,0,35651584
+All.4-ary.((x * y) * z) * w.ad,2600024,210776,4857,0,35651584
+All.4-ary.((x * y) * z) * w.ad/double,2635056,192074,4881,0,35651584
+All.4-ary.((x * y) * z) * w.backprop,3133015,172442,8890,0,35651584
+All.4-ary.((x * y) * z) * w.primops,391697,25862,1016,0,35651584
+All.4-ary.((x * y) * z) * w.primops/double,258943,13132,1067,0,35651584

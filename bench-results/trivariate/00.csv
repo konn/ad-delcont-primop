@@ -1,0 +1,7 @@
+Name,Mean (ps),2*Stdev (ps),Allocated,Copied,Peak Memory
+All.trivariate.(x * y) * z.transformers,1157914,82962,2038,0,35651584
+All.trivariate.(x * y) * z.ad,1983864,185096,4066,0,35651584
+All.trivariate.(x * y) * z.ad/double,2016610,193422,4061,0,35651584
+All.trivariate.(x * y) * z.backprop,2239649,116816,6433,0,35651584
+All.trivariate.(x * y) * z.primops,275532,23982,611,0,35651584
+All.trivariate.(x * y) * z.primops/double,170323,13394,687,0,35651584
