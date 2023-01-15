@@ -1,10 +1,12 @@
 {-# LANGUAGE DerivingStrategies #-}
+{-# LANGUAGE DerivingVia #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
 module Helpers ((==~), isDefinite) where
 
 import Data.Foldable
 import Linear
+import qualified Numeric.Backprop as BP
 import Test.Tasty.QuickCheck
 
 (==~) :: (Show (v Double), Foldable v, Metric v) => v Double -> v Double -> Property
@@ -41,3 +43,11 @@ instance Arbitrary a => Arbitrary (V4 a) where
   shrink = mapM shrink
 
 deriving newtype instance Arbitrary a => Arbitrary (V1 a)
+
+deriving via BP.NumBP (V1 a) instance Num a => BP.Backprop (V1 a)
+
+deriving via BP.NumBP (V2 a) instance Num a => BP.Backprop (V2 a)
+
+deriving via BP.NumBP (V3 a) instance Num a => BP.Backprop (V3 a)
+
+deriving via BP.NumBP (V4 a) instance Num a => BP.Backprop (V4 a)

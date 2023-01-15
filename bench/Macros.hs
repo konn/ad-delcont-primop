@@ -13,6 +13,7 @@ import qualified Numeric.AD.DelCont as MTL
 import qualified Numeric.AD.DelCont.Native as PrimOp
 import qualified Numeric.AD.DelCont.Native.Double as PrimOpDouble
 import qualified Numeric.AD.Double as ADDouble
+import qualified Numeric.Backprop as BP
 import Test.Tasty.Bench
 import Test.Tasty.QuickCheck
 
@@ -35,6 +36,7 @@ mkDiffBench func = do
       , bench "transformers" $ nf (snd . MTL.rad1 $func) (42.0 :: Double)
       , bench "ad" $ nf (AD.diff $func) (42.0 :: Double)
       , bench "ad/double" $ nf (ADDouble.diff $func) (42.0 :: Double)
+      , bench "backprop" $ nf (BP.gradBP $func) (42.0 :: Double)
       , bench "primops" $ nf (PrimOp.diff ($func :: PrimOp.AD s Double -> PrimOp.AD s Double)) (42.0 :: Double)
       , bench "primops/Double" $ nf (PrimOpDouble.diff $func) (42.0 :: Double)
       ]
@@ -48,28 +50,30 @@ unQualNames :: Name -> Name
 unQualNames = mkName . nameBase
 
 mkGradBench :: ExpQ -> ExpQ -> ExpQ
-mkGradBench func arg = do
+mkGradBench func arg0 = do
   lab <- showBody <$> runQ func
   [|
-    bgroup
-      lab
-      [ testProperty "ad and primops returns almost the same answer" $
-          \(x :: _ Double) ->
-            let ad = AD.grad $(func) x
-                primop =
-                  PrimOp.grad
-                    ($func :: _ (PrimOp.AD s Double) -> PrimOp.AD s Double)
-                    x
-             in classify (any (not . isDefinite) ad) "diverged" $ ad ==~ primop
-      , testProperty "ad/double and primops/double returns almost the same answer" $
-          \(x :: _ Double) ->
-            let ad = AD.grad $(func) x
-                primop = PrimOpDouble.grad $(func) x
-             in classify (any (not . isDefinite) ad) "diverged" $ ad ==~ primop
-      , bench "transformers" $ nf (snd . MTL.grad $func) ($arg :: _ Double)
-      , bench "ad" $ nf (AD.grad $func) ($(arg) :: _ Double)
-      , bench "ad/double" $ nf (ADDouble.grad $func) ($(arg) :: _ Double)
-      , bench "primops" $ nf (PrimOp.grad ($func :: _ (PrimOp.AD s Double) -> PrimOp.AD s Double)) ($(arg) :: _ Double)
-      , bench "primops/double" $ nf (PrimOpDouble.grad $func) ($(arg) :: _ Double)
-      ]
+    env (pure ($(arg0) :: _ Double)) $ \arg ->
+      bgroup
+        lab
+        [ testProperty "ad and primops returns almost the same answer" $
+            \(x :: _ Double) ->
+              let ad = AD.grad $(func) x
+                  primop =
+                    PrimOp.grad
+                      ($func :: _ (PrimOp.AD s Double) -> PrimOp.AD s Double)
+                      x
+               in classify (any (not . isDefinite) ad) "diverged" $ ad ==~ primop
+        , testProperty "ad/double and primops/double returns almost the same answer" $
+            \(x :: _ Double) ->
+              let ad = AD.grad $(func) x
+                  primop = PrimOpDouble.grad $(func) x
+               in classify (any (not . isDefinite) ad) "diverged" $ ad ==~ primop
+        , bench "transformers" $ nf (snd . MTL.grad $func) arg
+        , bench "ad" $ nf (AD.grad $func) arg
+        , bench "ad/double" $ nf (ADDouble.grad $func) arg
+        , bench "backprop" $ nf (BP.gradBP ($func . BP.sequenceVar)) arg
+        , bench "primops" $ nf (PrimOp.grad ($func :: _ (PrimOp.AD s Double) -> PrimOp.AD s Double)) arg
+        , bench "primops/double" $ nf (PrimOpDouble.grad $func) arg
+        ]
     |]

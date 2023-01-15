@@ -7,3 +7,8 @@ source-repository-package
   type: git
   location: https://github.com/konn/ad.git
   tag: 579579564617861a5f243f7516f7aeb354970173
+
+source-repository-package
+  type: git
+  location: https://github.com/konn/backprop.git
+  tag: 166de5ad553337e6a1b68cda13ba1593cf5f4e36

@@ -87,11 +87,10 @@ benchmark ad-delcont-primop-bench
     , ad
     , ad-delcont
     , ad-delcont-primop
+    , backprop
     , lens
     , tasty
     , tasty-bench
     , tasty-hunit
     , tasty-quickcheck
     , template-haskell
-
--- , backprop
