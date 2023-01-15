@@ -1,7 +1,13 @@
 {-# LANGUAGE GHC2021 #-}
 {-# LANGUAGE ImpredicativeTypes #-}
 {-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE MagicHash #-}
+{-# LANGUAGE PatternSynonyms #-}
 {-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE UnboxedSums #-}
+{-# LANGUAGE UnboxedTuples #-}
+{-# LANGUAGE UnliftedNewtypes #-}
+{-# LANGUAGE ViewPatterns #-}
 
 module Numeric.AD.DelCont.Native (
   AD',
@@ -22,26 +28,37 @@ import Control.Monad.ST.Strict
 import Data.Bifoldable
 import Data.Bifunctor
 import Data.Bitraversable
-import Data.STRef
+import Data.Primitive.MutVar
 import GHC.Generics
+import GHC.Prim
 import Numeric.AD.DelCont.Native.Internal
 
-data BRef s a = Ref !(STRef s a) | Const
+data BRef s a = BRef {-# UNPACK #-} !(# MutVar# s a | (# #) #)
+
+pattern Ref :: MutVar s a -> BRef s a
+pattern Ref ref <- BRef (# (MutVar -> ref) | #)
+  where
+    Ref (MutVar ref#) = BRef (# ref# | #)
+
+pattern Const :: BRef s a
+pattern Const = BRef (# | (# #) #)
+
+{-# COMPLETE Const, Ref #-}
 
 newBRef :: a -> ST s (BRef s a)
 {-# INLINE newBRef #-}
-newBRef = fmap Ref . newSTRef
+newBRef = fmap Ref . newMutVar
 
 modifyBRef' :: BRef s a -> (a -> a) -> ST s ()
 {-# INLINE modifyBRef' #-}
 modifyBRef' = \case
-  Ref ref -> modifySTRef' ref
+  Ref ref -> modifyMutVar' ref
   Const -> const $ pure ()
 
 writeBRef' :: BRef s a -> a -> ST s ()
 writeBRef' = \case
-  Ref ref -> \ !a -> writeSTRef ref a
-  Const -> const $ pure ()
+  Ref ref -> \ !a -> writeMutVar ref a
+  (Const) -> const $ pure ()
 
 readBRef :: BRef s a -> ST s a
 {-# INLINE readBRef #-}
@@ -50,7 +67,7 @@ readBRef = readBRefDefault $ error "Empty BRef!"
 readBRefDefault :: a -> BRef s a -> ST s a
 {-# INLINE readBRefDefault #-}
 readBRefDefault = \cases
-  _ (Ref ref) -> readSTRef ref
+  _ (Ref ref) -> readMutVar ref
   a Const -> pure a
 
 data AD' s a da = AD {primal :: !a, dual :: !(PromptTag () -> ST s (BRef s da))}
