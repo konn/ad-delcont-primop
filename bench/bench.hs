@@ -33,5 +33,7 @@ main =
         [ $(mkGradBench [|\(V4 x y z w) -> x * y * z * w|] [|V4 4 5 6 7|])
         , $(mkGradBench [|\(V4 x y z w) -> (x + w) ^ 4 * exp (x + cos (y ^ 2 * sin z) * w)|] [|V4 4 5 6 7|])
         , $(mkGradBench [|\(V4 x y z w) -> log (x ^ 2 + w) / log (x + w) ^ 4 * exp (x + cos (y ^ 2 * sin z) * w)|] [|V4 4 5 6 7|])
+        , $(mkGradBench [|\(V4 x y z w) -> logBase (x ^ 2 + w) (cos (x ^ 2 + 2 * z) + w + 1) ^ 4 * exp (x + sin (pi * x) * cos (exp y ^ 2 * sin z) * w)|] [|V4 4 5 6 7|])
+        , $(mkGradBench [|\(V4 x y z w) -> logBase (x ^ 2 + tanh w) (cos (x ^ 2 + 2 * z) + w + 1) ^ 4 + exp (x + sin (pi * x + w ^ 2) * cosh (exp y ^ 2 * sin z) ^ 2 * (w + 1))|] [|V4 4 5 6 7|])
         ]
     ]
