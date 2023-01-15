@@ -105,7 +105,7 @@ $$
 #### Really complex
 
 $$
-  f(x,y,z,w) = \log_{x ^ 2 + \tanh w} (\cos (x ^ 2 + 2z) + w + 1) ^ 4 + \exp (x + \sin (\pi x + w ^ 2) * \cosh ((e^y)^ 2 \sin z) ^ 2 (w + 1))
+  f(x,y,z,w) = \log_{x ^ 2 + \tanh w} (\cos (x ^ 2 + 2z) + w + 1) ^ 4 + \exp (x + \sin (\pi x + w ^ 2) \cosh ((e^y)^ 2 \sin z) ^ 2 (w + 1))
 $$
 
 ![almost as fast](./bench-results/4-ary/04.svg)
