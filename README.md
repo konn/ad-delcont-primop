@@ -2,12 +2,122 @@
 
 An attempt to implement Reverse-Mode AD in terms of delcont primops introduced in GHC 9.6.
 
-That is, reimplementing [`ad-delcont`][ad-delcont], which translates Scala implementation of [Backpropagation with Continuation Callbacks][cc-differ], in terms of `newPromptTag#`, `prompt#`, and `control0#`.
+That is, it reimplements [`ad-delcont`][ad-delcont], which translates Scala implementation of [Backpropagation with Continuation Callbacks][cc-differ], in terms of `newPromptTag#`, `prompt#`, and `control0#`.
+
+## Performance
+
+### Summary
+
+- Our implementation always outperforms [`backprop`][backprop] and [`ad-delcont`][ad-delcont] (monad transformer-based impl).
+- In computing multivariate gradients, our implementation is almost as fast as Edward Kmett's [`ad`][ad], and  in some cases 4x-10x faster than [`ad`][ad].
+- To differentiate univariate functions, always use [`ad`][ad] as it uses Forward-mode.
+
+### Legends
+
+- `transformers`: [`ad-delcont`][ad-delcont]
+- `ad`: [`ad`][ad], generic functions from `Numeric.AD`
+- `ad/double`: [`ad`][ad], `Double`-specialised functions provided in `Numeric.AD.Double`.
+- `backprop`: [`backprop`][backprop]
+- `primop`: our generic implementation.
+- `primop/double`: our implementation specialised for `Double`.
+
+
+### Univariate Differentiation
+
+#### Identity Function: $f(x) = x$
+
+![ad wins](./bench-results/univariate/00.svg)
+
+#### Binomial: $(x + 1)(x + 1)$
+
+![ad wins](./bench-results/univariate/01.svg)
+
+#### Gauß-like: $x e^{x^2 + 1}$
+
+![ad wins](./bench-results/univariate/02.svg)
+
+### Bivariate
+
+#### Addition: $f(x, y) = x + y$
+
+![we win by 10!](./bench-results/bivariate/00.svg)
+
+#### Trigonometrics: $f(x,y) = \sin x \cos y (x^2 + y)$
+
+![we are 4x faster!](./bench-results/bivariate/01.svg)
+
+### Exponentials: $f(x, y) = y e^{x^2 + y}$
+
+![still 4x faster!](./bench-results/bivariate/02.svg)
+
+### Exponentials and Trigonometrics: $f(x, y) = (x \cos x + y)^2 e^{x \sin (x + y^2 + 1)}$
+
+![twice as fast](./bench-results/bivariate/03.svg)
+
+### Complex formula
+
+$$
+f(x, y) = (\tanh (e^y  \cosh x) + x ^ 2) ^ 3 - (x \cos x + y) ^ 2 e^{x \sin (x + y ^2 + 1)}
+$$
+
+![1.5x fast](./bench-results/bivariate/04.svg)
+
+### Trivariate
+
+#### Multiplication: $f(x,y,z) = xyz$
+
+![10x fast](./bench-results/trivariate/00.svg)
+
+### Complex
+
+$$
+ (\tanh (e^{y + z ^ 2} \cosh x) + x ^ 2) ^ 3
+ - (x (z ^ 2 - 1) \cos x + y)^{2z} e^{x  \sin (x + yzx + 1)}
+$$
+
+![1.5x fast](./bench-results/trivariate/01.svg)
+
+### 4-ary (quadrivariate)
+
+#### Multiplication: $f(x,y,z,w) = xyzw$
+
+![10x fast](./bench-results/4-ary/00.svg)
+
+#### Trigonometrics: $f(x,y,z,w) =  (x + w) ^ 4 \exp(x + \cos (y ^ 2 \sin z) w)$
+
+![thrice as fast](./bench-results/4-ary/01.svg)
+
+#### Some logarithm
+
+$$
+  f(x,y,z,w) =  \log (x ^ 2 + w) / \log (x + w) ^ 4 \exp (x + \cos (y ^ 2 \sin z) w)
+$$
+
+![twice as fast](./bench-results/4-ary/02.svg)
+
+#### Some more logarithm
+
+$$
+  f(x,y,z,w) =  \log_{x ^ 2 + w}(\cos (x ^ 2 + 2 z) + w + 1) ^ 4 \exp (x + \sin (\pi x) \cos ((e^y) ^ 2 \sin z) w)
+$$
+
+![almost as fast](./bench-results/4-ary/03.svg)
+
+#### Really complex
+
+$$
+  f(x,y,z,w) = \log_{x ^ 2 + \tanh w} (\cos (x ^ 2 + 2z) + w + 1) ^ 4 + \exp (x + \sin (\pi x + w ^ 2) * \cosh ((e^y)^ 2 \sin z) ^ 2 (w + 1))
+$$
+
+![almost as fast](./bench-results/4-ary/04.svg)
+
+
 
 ## TODOs
 
-- Benchmarks
 - Explore more fine-grained use of delcont
+- Avoids (indirect) references at any costs!
+- Remove `Ref`s from constants
 
 ## References
 
