@@ -6,6 +6,7 @@ module Numeric.AD.DelCont.Native (
   AD',
   eval,
   konst,
+  diff,
   grad,
   op1,
   op2,
@@ -35,9 +36,9 @@ instance Bifoldable (:!:) where
   bifoldMap = bifoldMapDefault
   {-# INLINE bifoldMap #-}
 
-withGrad :: Num a => PromptTag () -> (a -> ST s ()) -> ST s (STRef s a)
-{-# INLINE withGrad #-}
-withGrad tag f = shift tag $ \k -> do
+withdiff :: Num a => PromptTag () -> (a -> ST s ()) -> ST s (STRef s a)
+{-# INLINE withdiff #-}
+withdiff tag f = shift tag $ \k -> do
   bx <- newSTRef 0
   k (pure bx)
   f =<< readSTRef bx
@@ -48,7 +49,7 @@ op1 f (AD x toDx) =
   let (!fx, !deriv) = f x
    in AD fx $ \tag -> do
         dx <- toDx tag
-        withGrad tag $ \dc ->
+        withdiff tag $ \dc ->
           modifySTRef' dx (+ deriv dc)
 
 op2 ::
@@ -62,7 +63,7 @@ op2 f (AD x toDx) (AD y toDy) =
    in AD fx $ \tag -> do
         dx <- toDx tag
         dy <- toDy tag
-        withGrad tag $ \dc -> do
+        withdiff tag $ \dc -> do
           modifySTRef' dx (+ derivX dc)
           modifySTRef' dy (+ derivY dc)
 
@@ -127,16 +128,32 @@ instance (Floating a, a ~ b) => Floating (AD' s a b) where
   atanh = op1 $ \x -> (atanh x, (/ (1 - x * x)))
   {-# INLINE atanh #-}
 
-eval :: (Num a) => (forall s. AD' s a a -> AD' s b b) -> a -> b
+eval :: (Num da) => (forall s. AD' s a da -> AD' s b db) -> a -> b
 {-# INLINE eval #-}
 eval op = primal . op . konst
 
-grad :: (Num da, Num db) => (forall s. AD' s a da -> AD' s b db) -> a -> da
-grad op a = runST $ do
+getDual :: PromptTag () -> AD' s a da -> ST s (STRef s da)
+{-# INLINE getDual #-}
+getDual tag = ($ tag) . dual
+
+diff :: (Num da, Num db) => (forall s. AD' s a da -> AD' s b db) -> a -> da
+diff op a = runST $ do
   ref <- newSTRef 0
   tag <- newPromptTag
   prompt tag $ do
-    let db = dual $ op $ AD a $ const $ pure ref
-    dbRef <- db tag
+    dbRef <- getDual tag $ op $ AD a $ const $ pure ref
     writeSTRef dbRef 1
   readSTRef ref
+
+grad ::
+  (Num da, Num db, Traversable t) =>
+  (forall s. t (AD' s a da) -> AD' s b db) ->
+  t a ->
+  t da
+grad f xs = runST $ do
+  inps <- mapM (\a -> (a,) <$> newSTRef 0) xs
+  tag <- newPromptTag
+  prompt tag $ do
+    db <- getDual tag (f $ fmap (\(a, ref) -> AD a $ const $ pure ref) inps)
+    writeSTRef db 1
+  mapM (readSTRef . snd) inps

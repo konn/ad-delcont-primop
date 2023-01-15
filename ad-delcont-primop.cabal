@@ -20,7 +20,7 @@ source-repository head
   type:     git
   location: https://github.com/githubuser/ad-delcont-primop
 
-common ghc-flags
+common commons
   ghc-options:
     -Wall -Wcompat -Widentities -Wincomplete-record-updates
     -Wincomplete-uni-patterns -Wmissing-export-lists
@@ -28,45 +28,46 @@ common ghc-flags
 
   default-language: GHC2021
   other-modules:    Paths_ad_delcont_primop
+  build-depends:
+    , base      >=4.7 && <5
+    , ghc-prim
+    , linear
+    , simple-reflect
 
 library
-  import:           ghc-flags
+  import:           commons
   exposed-modules:  Numeric.AD.DelCont.Native
   other-modules:    Numeric.AD.DelCont.Native.Internal
   hs-source-dirs:   src
   build-depends:
-    , base       >=4.7 && <5
-    , ghc-prim
     , primitive
     , vector
 
   default-language: Haskell2010
 
 executable ad-delcont-primop-exe
-  import:           ghc-flags
+  import:           commons
   main-is:          Main.hs
   other-modules:    Paths_ad_delcont_primop
   hs-source-dirs:   app
-  build-depends:
-    , ad-delcont-primop
-    , base               >=4.7 && <5
-
+  build-depends:    ad-delcont-primop
   default-language: Haskell2010
 
 test-suite ad-delcont-primop-test
-  import:           ghc-flags
-  type:             exitcode-stdio-1.0
-  main-is:          Spec.hs
-  other-modules:    Paths_ad_delcont_primop
-  hs-source-dirs:   test
+  import:             commons
+  type:               exitcode-stdio-1.0
+  main-is:            Spec.hs
+  other-modules:      Paths_ad_delcont_primop
+  hs-source-dirs:     test
+  build-tool-depends: tasty-discover:tasty-discover -any
   build-depends:
     , ad-delcont-primop
-    , base               >=4.7 && <5
+    , tasty
 
-  default-language: Haskell2010
+  default-language:   Haskell2010
 
 benchmark ad-delcont-primop-bench
-  import:         ghc-flags
+  import:         commons
   type:           exitcode-stdio-1.0
   main-is:        bench.hs
   other-modules:  Paths_ad_delcont_primop
@@ -75,7 +76,6 @@ benchmark ad-delcont-primop-bench
   build-depends:
     , ad-delcont
     , ad-delcont-primop
-    , base               >=4.7 && <5
     , tasty
     , tasty-bench
 
