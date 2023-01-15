@@ -42,29 +42,29 @@ jobs:
         cabal update
     - name: Build
       run: cabal build
-    # - name: Collect Binaries
-    #   run: |
-    #     set -euxo pipefail
-    #     wget -O- https://github.com/haskell-hvr/cabal-plan/releases/download/v0.6.2.0/cabal-plan-0.6.2.0-x86_64-linux.xz \
-    #       | xz -d - > cabal-plan
-    #     chmod +x cabal-plan
-    #     BIN_DIR=bins
-    #     mkdir -p ${BIN_DIR}/bin
-    #     ./cabal-plan list-bins  | \
-    #       grep -e :test: -e :bench: | awk '{ print $2 }' | \
-    #       while read -r FILE; do basename "${FILE}"; done > "${BIN_DIR}/bench.txt"
+    - name: Collect Binaries
+      run: |
+        set -euxo pipefail
+        wget -O- https://github.com/haskell-hvr/cabal-plan/releases/download/v0.6.2.0/cabal-plan-0.6.2.0-x86_64-linux.xz \
+          | xz -d - > cabal-plan
+        chmod +x cabal-plan
+        BIN_DIR=bins
+        mkdir -p ${BIN_DIR}/bin
+        ./cabal-plan list-bins  | \
+          grep -e :test: -e :bench: | awk '{ print $2 }' | \
+          while read -r FILE; do basename "${FILE}"; done > "${BIN_DIR}/bench.txt"
         
-    #     ./cabal-plan list-bins \
-    #       | grep ad-delcont-primop | awk '{ print $2 }' | while read -r BIN; do
-    #       strip "${BIN}"
-    #       cp "${BIN}" "${BIN_DIR}/bin/"
-    #     done
-    #     tar -cf "${{ env.ARTIFACT }}" --use-compress-program="zstdmt -9"  "${BIN_DIR}"
-    # - name: Upload Artifact
-    #   uses: actions/upload-artifact@v3
-    #   with:
-    #     name: binaries
-    #     path: "${{ env.ARTIFACT }}"
+        ./cabal-plan list-bins \
+          | grep ad-delcont-primop | awk '{ print $2 }' | while read -r BIN; do
+          strip "${BIN}"
+          cp "${BIN}" "${BIN_DIR}/bin/"
+        done
+        tar -cf "${{ env.ARTIFACT }}" --use-compress-program="zstdmt -9"  "${BIN_DIR}"
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: binaries
+        path: "${{ env.ARTIFACT }}"
 
   bench:
     needs: build
