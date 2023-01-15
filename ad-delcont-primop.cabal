@@ -74,14 +74,21 @@ benchmark ad-delcont-primop-bench
   import:         commons
   type:           exitcode-stdio-1.0
   main-is:        bench.hs
-  other-modules:  Paths_ad_delcont_primop
+  other-modules:
+    Helpers
+    Macros
+
   hs-source-dirs: bench
   ghc-options:    "-with-rtsopts=-A32m -T"
   build-depends:
     , ad-delcont
     , ad-delcont-primop
+    , lens
     , tasty
     , tasty-bench
+    , tasty-hunit
+    , tasty-quickcheck
+    , template-haskell
 
 -- , ad
 -- , backprop
