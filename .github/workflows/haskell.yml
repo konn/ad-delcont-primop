@@ -59,7 +59,7 @@ jobs:
           strip "${BIN}"
           cp "${BIN}" "${BIN_DIR}/bin/"
         done
-        tar --use-compress-program="zstdmt -9" caf "${{ env.ARTIFACT }}" "${BIN_DIR}"
+        tar -cf --use-compress-program="zstdmt -9" "${{ env.ARTIFACT }}" "${BIN_DIR}"
     - name: Upload Artifact
       uses: actions/upload-artifact@v3
       with:
