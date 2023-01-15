@@ -126,6 +126,12 @@ instance (Floating a, a ~ b) => Floating (AD' s a b) where
   {-# INLINE exp #-}
   log = op1 $ \x -> (log x, (/ x))
   {-# INLINE log #-}
+  logBase = op2 $ \x y ->
+    ( logBase x y
+    , (* (-logBase x y / (log x * x)))
+    , (/ (y * log x))
+    )
+  {-# INLINE logBase #-}
   sqrt = op1 $ \x -> (sqrt x, (/ (2 * sqrt x)))
   {-# INLINE sqrt #-}
   sin = op1 $ \x -> (sin x, (* cos x))
