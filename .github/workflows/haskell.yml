@@ -84,5 +84,18 @@ jobs:
         ls ${{ steps.download.outputs.download-path }}
         tar xvf ${{ steps.download.outputs.download-path }}/artifacts.tar.zst --directory=.
     - name: Run Bench
+      env: 
+        BENCHMARK: bins/bin/ad-delcont-native-bench
       run: |
-        ls
+        rm -rf bench-results
+        mkdir -p bench-results
+        ${{ env.BENCHMARK }} -j1 -p /univariate/ --csv bench-results/univariate.csv --svg bench-results/univariate.svg
+        ${{ env.BENCHMARK }} -j1 -p /bivariate/ --csv bench-results/bivariate.csv --svg bench-results/bivariate.svg
+        ${{ env.BENCHMARK }} -j1 -p /trivariate/ --csv bench-results/trivariate.csv --svg bench-results/trivariate.svg
+        ${{ env.BENCHMARK }} -j1 -p /4-ary/ --csv bench-results/4-ary.csv --svg bench-results/4-ary.svg
+        tar -cf bench-results.tar.zst --use-compress-program="zstdmt -9" bench-results
+    - name: Upload Bench Results
+      uses: actions/upload-artifact@v3
+      with:
+        name: bench-results
+        path: bench-results.tar.zst
