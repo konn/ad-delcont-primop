@@ -28,4 +28,10 @@ main =
         [ $(mkGradBench [|\(V3 x y z) -> x * y * z|] [|V3 4 5 6|])
         , $(mkGradBench [|\(V3 x y z) -> (tanh (exp (y + z ^ 2) * cosh x) + x ^ 2) ^ 3 - (x * (z ^ 2 - 1) * cos x + y) ** (2 * z) * exp (x * sin (x + y * z * x + 1))|] [|V3 4 5 6|])
         ]
+    , bgroup
+        "4-ary"
+        [ $(mkGradBench [|\(V4 x y z w) -> x * y * z * w|] [|V4 4 5 6 7|])
+        , $(mkGradBench [|\(V4 x y z w) -> (x + w) ^ 4 * exp (x + cos (y ^ 2 * sin z) * w)|] [|V4 4 5 6 7|])
+        , $(mkGradBench [|\(V4 x y z w) -> log (x ^ 2 + w) / log (x + w) ^ 4 * exp (x + cos (y ^ 2 * sin z) * w)|] [|V4 4 5 6 7|])
+        ]
     ]
