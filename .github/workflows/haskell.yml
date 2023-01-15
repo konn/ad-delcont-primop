@@ -1,0 +1,57 @@
+name: Build
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    env:
+      ARTIFACT: ${{github.workspace}}/artifacts.tar.zst
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Cache ~/.cabal/store
+      uses: actions/cache@v3
+      with:
+        path: ~/.cabal/store
+        key: cabal-store-961-alpha-${{hashFiles('cabal.project.freeze', 'cabal.project', '*.cabal')}}
+        restore-keys:
+          cabal-store-961-alpha-
+    - name: Cache dist-newstyle
+      uses: actions/cache@v3
+      with:
+        path: dist-newstyle
+        key: cabal-dist-961-alpha-${{hashFiles('cabal.project.freeze', 'cabal.project', '**/*.cabal')}}-${{hashFiles('**/*.hs')}}
+        restore-keys: |
+          cabal-dist-961-alpha-${{hashFiles('cabal.project.freeze', 'cabal.project', '**/*.cabal')}}-
+          cabal-dist-961-alpha-
+    - name: Setup Haskell
+      run: |
+        curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | BOOTSTRAP_HASKELL_NONINTERACTIVE=1 BOOTSTRAP_HASKELL_MINIMAL=1 sh
+        ghcup config add-release-channel https://raw.githubusercontent.com/haskell/ghcup-metadata/master/ghcup-prereleases-0.0.7.yaml
+        ghcup install ghc   9.6.0.20230111
+        ghcup install cabal 3.8.1.0
+    - name: Configure
+      run: >
+        cabal configure --jobs '$ncpus'
+        --with-compiler ghc-9.6.0.20230111
+        --enable-optimisation 2
+        --enable-benchmarks --enable-tests
+    - name: Build
+      run: cabal build
+    - name: Collect Binaries
+      run: |
+        set -euxo pipefail
+        wget https://github.com/haskell-hvr/cabal-plan/releases/download/v0.6.2.0/cabal-plan-0.6.2.0-x86_64-linux.xz
+        BIN_DIR=bins
+        mkdir -p ${BIN_DIR}
+        xz -d cabal-plan-0.6.2.0-x86_64-linux.xz
+        ./cabal-plan list-bins | grep ad-delcont-primop | awk '{ print $2 }' | while read -r BIN; do
+          strip "${BIN}"
+          cp "${BIN}" "${BIN_DIR}/"
+        done
+        tar --use-compress-program="zstdmt -9" caf "${{ env.ARTIFACT }}" "${BIN_DIR}"
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: binaries
+        path: "${{ env.ARTIFACT }}"
