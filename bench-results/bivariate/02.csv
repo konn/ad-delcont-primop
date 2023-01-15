@@ -1,7 +1,7 @@
 Name,Mean (ps),2*Stdev (ps),Allocated,Copied,Peak Memory
-All.bivariate.y * exp ((x * x) + y).transformers,1380142,88642,2438,0,35651584
-All.bivariate.y * exp ((x * x) + y).ad,1984566,193804,4067,0,35651584
-All.bivariate.y * exp ((x * x) + y).ad/double,1906422,177628,4065,0,35651584
-All.bivariate.y * exp ((x * x) + y).backprop,2447091,109660,7106,0,35651584
-All.bivariate.y * exp ((x * x) + y).primops,469826,34320,1019,0,35651584
-All.bivariate.y * exp ((x * x) + y).primops/double,286358,12822,1070,0,35651584
+All.bivariate.y * exp ((x * x) + y).transformers,1406389,116420,2438,0,35651584
+All.bivariate.y * exp ((x * x) + y).ad,1951049,115036,4474,0,35651584
+All.bivariate.y * exp ((x * x) + y).ad/double,1890458,106476,4471,0,35651584
+All.bivariate.y * exp ((x * x) + y).backprop,2350500,101676,7106,0,35651584
+All.bivariate.y * exp ((x * x) + y).primops,450564,41006,1019,0,35651584
+All.bivariate.y * exp ((x * x) + y).primops/double,295242,27616,1019,0,35651584

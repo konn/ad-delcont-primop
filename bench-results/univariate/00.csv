@@ -1,7 +1,7 @@
 Name,Mean (ps),2*Stdev (ps),Allocated,Copied,Peak Memory
-All.univariate.id.transformers,75324,5622,153,0,35651584
-All.univariate.id.ad,22607,1336,22,0,35651584
-All.univariate.id.ad/double,22624,1302,22,0,35651584
-All.univariate.id.backprop,248155,22508,510,0,35651584
-All.univariate.id.primops,52239,2914,76,0,35651584
-All.univariate.id.primops/Double,71150,5894,216,0,35651584
+All.univariate.id.transformers,76385,2662,159,0,35651584
+All.univariate.id.ad,22966,1392,22,0,35651584
+All.univariate.id.ad/double,23046,1310,22,0,35651584
+All.univariate.id.backprop,255086,20570,510,0,35651584
+All.univariate.id.primops,53342,5232,63,0,35651584
+All.univariate.id.primops/Double,72853,5280,216,0,35651584

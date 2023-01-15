@@ -8,9 +8,10 @@ That is, it reimplements [`ad-delcont`][ad-delcont], which translates Scala impl
 
 ### Summary
 
-- Our implementation always outperforms [`backprop`][backprop] and [`ad-delcont`][ad-delcont] (monad transformer-based impl).
-- In computing multivariate gradients, our implementation is almost as fast as Edward Kmett's [`ad`][ad], and  in some cases 4x-10x faster than [`ad`][ad].
+- In computing multivariate gradients: in most cases, our implementation is at most slightly faster than Edward Kmett's [`ad`][ad].
+  In some cases, ours is 4x-10x faster.
 - To differentiate univariate functions, always use [`ad`][ad] as it uses Forward-mode.
+- Our implementation in most cases outperforms [`backprop`][backprop] and [`ad-delcont`][ad-delcont] (monad transformer-based impl).
 
 ### Legends
 
@@ -100,7 +101,7 @@ $$
   f(x,y,z,w) =  \log_{x ^ 2 + w}(\cos (x ^ 2 + 2 z) + w + 1) ^ 4 \exp (x + \sin (\pi x) \cos ((e^y) ^ 2 \sin z) w)
 $$
 
-![almost as fast](./bench-results/4-ary/03.svg)
+![slightly faster](./bench-results/4-ary/03.svg)
 
 #### Really complex
 
@@ -108,7 +109,7 @@ $$
   f(x,y,z,w) = \log_{x ^ 2 + \tanh w} (\cos (x ^ 2 + 2z) + w + 1) ^ 4 + \exp (x + \sin (\pi x + w ^ 2) \cosh ((e^y)^ 2 \sin z) ^ 2 (w + 1))
 $$
 
-![almost as fast](./bench-results/4-ary/04.svg)
+![slightly faster](./bench-results/4-ary/04.svg)
 
 ## TODOs
 

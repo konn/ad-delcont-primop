@@ -1,7 +1,7 @@
 Name,Mean (ps),2*Stdev (ps),Allocated,Copied,Peak Memory
-All.4-ary.(logBase ((x ^ 2) + tanh w) ((cos ((x ^ 2) + (2 * z)) + w) + 1) ^ 4) + exp (x + ((sin ((pi * x) + (w ^ 2)) * (cosh ((exp y ^ 2) * sin z) ^ 2)) * (w + 1))).transformers,18239848,1765662,27682,4,35651584
-All.4-ary.(logBase ((x ^ 2) + tanh w) ((cos ((x ^ 2) + (2 * z)) + w) + 1) ^ 4) + exp (x + ((sin ((pi * x) + (w ^ 2)) * (cosh ((exp y ^ 2) * sin z) ^ 2)) * (w + 1))).ad,8695205,694818,16232,2,35651584
-All.4-ary.(logBase ((x ^ 2) + tanh w) ((cos ((x ^ 2) + (2 * z)) + w) + 1) ^ 4) + exp (x + ((sin ((pi * x) + (w ^ 2)) * (cosh ((exp y ^ 2) * sin z) ^ 2)) * (w + 1))).ad/double,6987946,409370,13792,0,35651584
-All.4-ary.(logBase ((x ^ 2) + tanh w) ((cos ((x ^ 2) + (2 * z)) + w) + 1) ^ 4) + exp (x + ((sin ((pi * x) + (w ^ 2)) * (cosh ((exp y ^ 2) * sin z) ^ 2)) * (w + 1))).backprop,14249448,673746,32419,4,35651584
-All.4-ary.(logBase ((x ^ 2) + tanh w) ((cos ((x ^ 2) + (2 * z)) + w) + 1) ^ 4) + exp (x + ((sin ((pi * x) + (w ^ 2)) * (cosh ((exp y ^ 2) * sin z) ^ 2)) * (w + 1))).primops,9414052,672152,27494,1,35651584
-All.4-ary.(logBase ((x ^ 2) + tanh w) ((cos ((x ^ 2) + (2 * z)) + w) + 1) ^ 4) + exp (x + ((sin ((pi * x) + (w ^ 2)) * (cosh ((exp y ^ 2) * sin z) ^ 2)) * (w + 1))).primops/double,6466254,328192,25811,1,35651584
+All.4-ary.(logBase ((x ^ 2) + tanh w) ((cos ((x ^ 2) + (2 * z)) + w) + 1) ^ 4) + exp (x + ((sin ((pi * x) + (w ^ 2)) * (cosh ((exp y ^ 2) * sin z) ^ 2)) * (w + 1))).transformers,17168740,722266,27682,4,35651584
+All.4-ary.(logBase ((x ^ 2) + tanh w) ((cos ((x ^ 2) + (2 * z)) + w) + 1) ^ 4) + exp (x + ((sin ((pi * x) + (w ^ 2)) * (cosh ((exp y ^ 2) * sin z) ^ 2)) * (w + 1))).ad,8610849,710976,16232,2,35651584
+All.4-ary.(logBase ((x ^ 2) + tanh w) ((cos ((x ^ 2) + (2 * z)) + w) + 1) ^ 4) + exp (x + ((sin ((pi * x) + (w ^ 2)) * (cosh ((exp y ^ 2) * sin z) ^ 2)) * (w + 1))).ad/double,6833374,656408,11358,0,35651584
+All.4-ary.(logBase ((x ^ 2) + tanh w) ((cos ((x ^ 2) + (2 * z)) + w) + 1) ^ 4) + exp (x + ((sin ((pi * x) + (w ^ 2)) * (cosh ((exp y ^ 2) * sin z) ^ 2)) * (w + 1))).backprop,13718808,1329062,32420,4,35651584
+All.4-ary.(logBase ((x ^ 2) + tanh w) ((cos ((x ^ 2) + (2 * z)) + w) + 1) ^ 4) + exp (x + ((sin ((pi * x) + (w ^ 2)) * (cosh ((exp y ^ 2) * sin z) ^ 2)) * (w + 1))).primops,8280039,800332,24243,1,35651584
+All.4-ary.(logBase ((x ^ 2) + tanh w) ((cos ((x ^ 2) + (2 * z)) + w) + 1) ^ 4) + exp (x + ((sin ((pi * x) + (w ^ 2)) * (cosh ((exp y ^ 2) * sin z) ^ 2)) * (w + 1))).primops/double,5662126,338074,21775,1,35651584

@@ -1,7 +1,7 @@
 Name,Mean (ps),2*Stdev (ps),Allocated,Copied,Peak Memory
-All.4-ary.(logBase ((x ^ 2) + w) ((cos ((x ^ 2) + (2 * z)) + w) + 1) ^ 4) * exp (x + ((sin (pi * x) * cos ((exp y ^ 2) * sin z)) * w)).transformers,13321630,923578,19552,1,36700160
-All.4-ary.(logBase ((x ^ 2) + w) ((cos ((x ^ 2) + (2 * z)) + w) + 1) ^ 4) * exp (x + ((sin (pi * x) * cos ((exp y ^ 2) * sin z)) * w)).ad,7726386,755284,11370,0,36700160
-All.4-ary.(logBase ((x ^ 2) + w) ((cos ((x ^ 2) + (2 * z)) + w) + 1) ^ 4) * exp (x + ((sin (pi * x) * cos ((exp y ^ 2) * sin z)) * w)).ad/double,6189548,333204,13786,0,36700160
-All.4-ary.(logBase ((x ^ 2) + w) ((cos ((x ^ 2) + (2 * z)) + w) + 1) ^ 4) * exp (x + ((sin (pi * x) * cos ((exp y ^ 2) * sin z)) * w)).backprop,11279287,924320,27447,0,36700160
-All.4-ary.(logBase ((x ^ 2) + w) ((cos ((x ^ 2) + (2 * z)) + w) + 1) ^ 4) * exp (x + ((sin (pi * x) * cos ((exp y ^ 2) * sin z)) * w)).primops,7722253,367454,21757,1,36700160
-All.4-ary.(logBase ((x ^ 2) + w) ((cos ((x ^ 2) + (2 * z)) + w) + 1) ^ 4) * exp (x + ((sin (pi * x) * cos ((exp y ^ 2) * sin z)) * w)).primops/double,5239660,403866,21792,1,36700160
+All.4-ary.(logBase ((x ^ 2) + w) ((cos ((x ^ 2) + (2 * z)) + w) + 1) ^ 4) * exp (x + ((sin (pi * x) * cos ((exp y ^ 2) * sin z)) * w)).transformers,13048955,703204,19552,1,36700160
+All.4-ary.(logBase ((x ^ 2) + w) ((cos ((x ^ 2) + (2 * z)) + w) + 1) ^ 4) * exp (x + ((sin (pi * x) * cos ((exp y ^ 2) * sin z)) * w)).ad,7465664,740348,11370,0,36700160
+All.4-ary.(logBase ((x ^ 2) + w) ((cos ((x ^ 2) + (2 * z)) + w) + 1) ^ 4) * exp (x + ((sin (pi * x) * cos ((exp y ^ 2) * sin z)) * w)).ad/double,6132353,336380,13786,0,36700160
+All.4-ary.(logBase ((x ^ 2) + w) ((cos ((x ^ 2) + (2 * z)) + w) + 1) ^ 4) * exp (x + ((sin (pi * x) * cos ((exp y ^ 2) * sin z)) * w)).backprop,11013901,755348,27447,0,36700160
+All.4-ary.(logBase ((x ^ 2) + w) ((cos ((x ^ 2) + (2 * z)) + w) + 1) ^ 4) * exp (x + ((sin (pi * x) * cos ((exp y ^ 2) * sin z)) * w)).primops,6734287,425572,17842,1,36700160
+All.4-ary.(logBase ((x ^ 2) + w) ((cos ((x ^ 2) + (2 * z)) + w) + 1) ^ 4) * exp (x + ((sin (pi * x) * cos ((exp y ^ 2) * sin z)) * w)).primops/double,4455029,391474,17767,0,36700160
