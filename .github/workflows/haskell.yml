@@ -85,7 +85,7 @@ jobs:
         tar xvf ${{ steps.download.outputs.download-path }}/artifacts.tar.zst --directory=.
     - name: Run Bench
       env: 
-        BENCHMARK: bins/bin/ad-delcont-native-bench
+        BENCHMARK: bins/bin/ad-delcont-primop-bench
       run: |
         rm -rf bench-results
         mkdir -p bench-results
