@@ -1,7 +1,7 @@
 {-# LANGUAGE DerivingStrategies #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
-module Helpers ((==~)) where
+module Helpers ((==~), isDefinite) where
 
 import Data.Foldable
 import Linear

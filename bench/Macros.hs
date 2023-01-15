@@ -22,16 +22,16 @@ mkDiffBench func = do
   [|
     bgroup
       lab
-      [ testProperty "transformers and primops returns almost the same answer" $
-          \(x :: Double) ->
-            let mtl = snd (MTL.rad1 $(func) x)
-                primop = PrimOp.diff ($func :: PrimOp.AD s Double -> PrimOp.AD s Double) x
-             in V1 mtl ==~ V1 primop
-      , testProperty "ad and primops returns almost the same answer" $
+      [ testProperty "ad and primops returns almost the same answer" $
           \(x :: Double) ->
             let ad = AD.diff $(func) x
                 primop = PrimOp.diff ($func :: PrimOp.AD s Double -> PrimOp.AD s Double) x
-             in V1 ad ==~ V1 primop
+             in classify (not $ isDefinite primop) "diverged" $ V1 ad ==~ V1 primop
+      , testProperty "ad/double and primops/double returns almost the same answer" $
+          \(x :: Double) ->
+            let ad = AD.diff $(func) x
+                primop = PrimOpDouble.diff $(func) x
+             in classify (not $ isDefinite primop) "diverged" $ V1 ad ==~ V1 primop
       , bench "transformers" $ nf (snd . MTL.rad1 $func) (42.0 :: Double)
       , bench "ad" $ nf (AD.diff $func) (42.0 :: Double)
       , bench "ad/double" $ nf (ADDouble.diff $func) (42.0 :: Double)
@@ -53,22 +53,19 @@ mkGradBench func arg = do
   [|
     bgroup
       lab
-      [ testProperty "transformers and primops returns almost the same answer" $
-          \(x :: _ Double) ->
-            let mtl = snd (MTL.grad $(func) x)
-                primop =
-                  PrimOp.grad
-                    ($func :: _ (PrimOp.AD s Double) -> PrimOp.AD s Double)
-                    x
-             in mtl ==~ primop
-      , testProperty "ad and primops returns almost the same answer" $
+      [ testProperty "ad and primops returns almost the same answer" $
           \(x :: _ Double) ->
             let ad = AD.grad $(func) x
                 primop =
                   PrimOp.grad
                     ($func :: _ (PrimOp.AD s Double) -> PrimOp.AD s Double)
                     x
-             in ad ==~ primop
+             in classify (any (not . isDefinite) ad) "diverged" $ ad ==~ primop
+      , testProperty "ad/double and primops/double returns almost the same answer" $
+          \(x :: _ Double) ->
+            let ad = AD.grad $(func) x
+                primop = PrimOpDouble.grad $(func) x
+             in classify (any (not . isDefinite) ad) "diverged" $ ad ==~ primop
       , bench "transformers" $ nf (snd . MTL.grad $func) ($arg :: _ Double)
       , bench "ad" $ nf (AD.grad $func) ($(arg) :: _ Double)
       , bench "ad/double" $ nf (ADDouble.grad $func) ($(arg) :: _ Double)
