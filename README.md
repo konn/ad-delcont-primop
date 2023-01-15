@@ -112,8 +112,12 @@ $$
 
 ## TODOs
 
-- Explore more fine-grained use of delcont
-  + Can we use separate `PromptTag` to backpropagate intermediate values without refs?
+- :checkmark: Explore more fine-grained use of delcont
+  + See `Numeric.AD.DelCont.MultiPrompt` for PoC
+  + We can abolish refs except for the ones for the outermost primitive variables
+    * perhaps coroutine-like hack can eliminateThis
+  + This implementation, however, is not as efficient as STRef-based in terms of both time and space
+    * This is because each continuation allocates different values rather than single mutable variable
 - Avoids (indirect) references at any costs!
 - ~~Remove `Ref`s from constants~~
   + This increases both runtime and allocation by twice (see [the benchmark log][const-ref-log])

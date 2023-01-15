@@ -42,6 +42,7 @@ library
     Numeric.AD.DelCont.Native
     Numeric.AD.DelCont.Native.Double
     Numeric.AD.DelCont.Native.Linear
+    Numeric.AD.DelCont.Native.MultiPrompt
 
   other-modules:    Numeric.AD.DelCont.Native.Internal
   hs-source-dirs:   src

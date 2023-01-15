@@ -7,7 +7,7 @@
 module Numeric.AD.DelCont.Native.Internal (
   PromptTag,
   newPromptTag,
-  withPrompt,
+  reset,
   prompt,
   control0,
   shift,
@@ -33,8 +33,9 @@ prompt (PromptTag tag) =
   unsafeSTToIO >>> \case
     IO f -> unsafeIOToST $ IO $ prompt# tag f
 
-withPrompt :: (PromptTag a -> ST s a) -> ST s a
-withPrompt = (=<< newPromptTag)
+reset :: (PromptTag a -> ST s a) -> ST s a
+{-# INLINE reset #-}
+reset act = (prompt <*> act) =<< newPromptTag
 
 shift :: PromptTag a -> ((ST s p -> ST s a) -> ST s a) -> ST s p
 {-# INLINE shift #-}
