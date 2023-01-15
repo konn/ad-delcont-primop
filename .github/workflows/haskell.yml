@@ -76,8 +76,12 @@ jobs:
     - name: Download Artifact
       id: download
       uses: actions/download-artifact@v3
+      with: 
+        name: binaries
     - name: Decompress
       run: |
+        echo ${{ steps.download.outputs.download-path }}
+        ls ${{ steps.download.outputs.download-path }}
         tar xvf ${{ steps.download.outputs.download-path }}/artifacts.tar.zst --directory=.
     - name: Run Bench
       run: |
