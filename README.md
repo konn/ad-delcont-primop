@@ -114,6 +114,7 @@ $$
 ## TODOs
 
 - Explore more fine-grained use of delcont
+  + Can we use separate `PromptTag` to backpropagate intermediate values without refs?
 - Avoids (indirect) references at any costs!
 - ~~Remove `Ref`s from constants~~
   + This increases both runtime and allocation by twice (see [the benchmark log][const-ref-log])
