@@ -37,7 +37,10 @@ common commons
 library
   import:           commons
   exposed-modules:
+    Data.PRef
+    Data.URef
     Numeric.AD.DelCont.Native
+    Numeric.AD.DelCont.Native.Double
     Numeric.AD.DelCont.Native.Linear
 
   other-modules:    Numeric.AD.DelCont.Native.Internal

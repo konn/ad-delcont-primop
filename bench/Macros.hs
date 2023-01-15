@@ -11,6 +11,7 @@ import Linear
 import qualified Numeric.AD as AD
 import qualified Numeric.AD.DelCont as MTL
 import qualified Numeric.AD.DelCont.Native as PrimOp
+import qualified Numeric.AD.DelCont.Native.Double as PrimOpDouble
 import qualified Numeric.AD.Double as ADDouble
 import Test.Tasty.Bench
 import Test.Tasty.QuickCheck
@@ -35,6 +36,7 @@ mkDiffBench func = do
       , bench "ad" $ nf (AD.diff $func) (42.0 :: Double)
       , bench "ad/double" $ nf (ADDouble.diff $func) (42.0 :: Double)
       , bench "primops" $ nf (PrimOp.diff ($func :: PrimOp.AD s Double -> PrimOp.AD s Double)) (42.0 :: Double)
+      , bench "primops/Double" $ nf (PrimOpDouble.diff $func) (42.0 :: Double)
       ]
     |]
 
@@ -71,5 +73,6 @@ mkGradBench func arg = do
       , bench "ad" $ nf (AD.grad $func) ($(arg) :: _ Double)
       , bench "ad/double" $ nf (ADDouble.grad $func) ($(arg) :: _ Double)
       , bench "primops" $ nf (PrimOp.grad ($func :: _ (PrimOp.AD s Double) -> PrimOp.AD s Double)) ($(arg) :: _ Double)
+      , bench "primops/double" $ nf (PrimOpDouble.grad $func) ($(arg) :: _ Double)
       ]
     |]
