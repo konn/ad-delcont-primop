@@ -75,8 +75,8 @@ infixl 7 ^/
 (^/) = op2' L.zero (L.^+^) (+) $ \v c ->
   (v L.^/ c, (L.^/ c), \dz -> (-dz `L.dot` v / (c * c)))
 
-zero :: (L.Additive v, L.Additive u, Num a, Num da) => AD' s (v a) (u da)
-zero = konst' L.zero L.zero
+zero :: (L.Additive v, Num a) => AD' s (v a) (u da)
+zero = konst L.zero
 
 sumV ::
   (Foldable t, L.Additive v, L.Additive u, Num a, Num da) =>

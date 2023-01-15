@@ -1,5 +1,6 @@
 {-# LANGUAGE GHC2021 #-}
 {-# LANGUAGE ImpredicativeTypes #-}
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE RankNTypes #-}
 
 module Numeric.AD.DelCont.Native (
@@ -7,7 +8,6 @@ module Numeric.AD.DelCont.Native (
   AD,
   eval,
   konst,
-  konst',
   diff,
   grad,
   jacobian,
@@ -26,7 +26,34 @@ import Data.STRef
 import GHC.Generics
 import Numeric.AD.DelCont.Native.Internal
 
-data AD' s a da = AD {primal :: !a, dual :: !(PromptTag () -> ST s (STRef s da))}
+data BRef s a = Ref !(STRef s a) | Const
+
+newBRef :: a -> ST s (BRef s a)
+{-# INLINE newBRef #-}
+newBRef = fmap Ref . newSTRef
+
+modifyBRef' :: BRef s a -> (a -> a) -> ST s ()
+{-# INLINE modifyBRef' #-}
+modifyBRef' = \case
+  Ref ref -> modifySTRef' ref
+  Const -> const $ pure ()
+
+writeBRef' :: BRef s a -> a -> ST s ()
+writeBRef' = \case
+  Ref ref -> \ !a -> writeSTRef ref a
+  Const -> const $ pure ()
+
+readBRef :: BRef s a -> ST s a
+{-# INLINE readBRef #-}
+readBRef = readBRefDefault $ error "Empty BRef!"
+
+readBRefDefault :: a -> BRef s a -> ST s a
+{-# INLINE readBRefDefault #-}
+readBRefDefault = \cases
+  _ (Ref ref) -> readSTRef ref
+  a Const -> pure a
+
+data AD' s a da = AD {primal :: !a, dual :: !(PromptTag () -> ST s (BRef s da))}
 
 type AD s a = AD' s a a
 
@@ -44,12 +71,12 @@ instance Bifoldable (:!:) where
   bifoldMap = bifoldMapDefault
   {-# INLINE bifoldMap #-}
 
-withGrad' :: a -> PromptTag () -> (a -> ST s ()) -> ST s (STRef s a)
+withGrad' :: a -> PromptTag () -> (a -> ST s ()) -> ST s (BRef s a)
 {-# INLINE withGrad' #-}
 withGrad' zero tag f = shift tag $ \k -> do
-  bx <- newSTRef zero
+  bx <- newBRef zero
   k (pure bx)
-  f =<< readSTRef bx
+  f =<< readBRefDefault zero bx
 
 op1 :: (Num da, Num db) => (a -> (b, db -> da)) -> AD' s a da -> AD' s b db
 {-# INLINE op1 #-}
@@ -62,7 +89,7 @@ op1' zerodb addda f (AD x toDx) =
    in AD fx $ \tag -> do
         dx <- toDx tag
         withGrad' zerodb tag $ \dc ->
-          modifySTRef' dx (`addda` deriv dc)
+          modifyBRef' dx (`addda` deriv dc)
 
 op2 ::
   (Num da, Num db, Num dc) =>
@@ -86,14 +113,11 @@ op2' zeroDc addDa addDb f (AD x toDx) (AD y toDy) =
         dx <- toDx tag
         dy <- toDy tag
         withGrad' zeroDc tag $ \dc -> do
-          modifySTRef' dx (`addDa` derivX dc)
-          modifySTRef' dy (`addDb` derivY dc)
+          modifyBRef' dx (`addDa` derivX dc)
+          modifyBRef' dy (`addDb` derivY dc)
 
-konst :: Num da => a -> AD' s a da
-konst = konst' 0
-
-konst' :: da -> a -> AD' s a da
-konst' zeroDa = flip AD (const $ newSTRef zeroDa)
+konst :: a -> AD' s a da
+konst = flip AD (const $ pure Const)
 
 instance (Num a, a ~ b) => Num (AD' s a b) where
   fromInteger = konst . fromInteger
@@ -159,23 +183,23 @@ instance (Floating a, a ~ b) => Floating (AD' s a b) where
   atanh = op1 $ \x -> (atanh x, (/ (1 - x * x)))
   {-# INLINE atanh #-}
 
-eval :: (Num da) => (forall s. AD' s a da -> AD' s b db) -> a -> b
+eval :: (forall s. AD' s a da -> AD' s b db) -> a -> b
 {-# INLINE eval #-}
 eval op = primal . op . konst
 
-getDual :: PromptTag () -> AD' s a da -> ST s (STRef s da)
+getDual :: PromptTag () -> AD' s a da -> ST s (BRef s da)
 {-# INLINE getDual #-}
 getDual tag = ($ tag) . dual
 
 diff :: (Num da, Num db) => (forall s. AD' s a da -> AD' s b db) -> a -> da
 {-# INLINE diff #-}
 diff op a = runST $ do
-  ref <- newSTRef 0
+  ref <- newBRef 0
   tag <- newPromptTag
   prompt tag $ do
     dbRef <- getDual tag $ op $ AD a $ const $ pure ref
-    writeSTRef dbRef 1
-  readSTRef ref
+    writeBRef' dbRef 1
+  readBRefDefault 0 ref
 
 grad ::
   (Num da, Num db, Traversable t) =>
@@ -184,12 +208,12 @@ grad ::
   t da
 {-# INLINE grad #-}
 grad f xs = runST $ do
-  inps <- mapM (\a -> (a,) <$> newSTRef 0) xs
+  inps <- mapM (\a -> (a,) <$> newBRef 0) xs
   tag <- newPromptTag
   prompt tag $ do
     db <- getDual tag $ f $ fmap (\(a, ref) -> AD a $ const $ pure ref) inps
-    writeSTRef db 1
-  mapM (readSTRef . snd) inps
+    writeBRef' db 1
+  mapM (readBRefDefault 0 . snd) inps
 
 jacobian ::
   (Num da, Num db, Traversable t, Traversable g) =>
@@ -198,11 +222,11 @@ jacobian ::
   g (t da)
 {-# INLINE jacobian #-}
 jacobian f xs = runST $ do
-  inps <- mapM (\a -> (a,) <$> newSTRef 0) xs
+  inps <- mapM (\a -> (a,) <$> newBRef 0) xs
   let duals = fmap dual $ f $ fmap (\(a, ref) -> AD a $ const $ pure ref) inps
   forM duals $ \toDzi -> do
     tag <- newPromptTag
-    prompt tag $ flip writeSTRef 1 =<< toDzi tag
-    ans <- mapM (readSTRef . snd) inps
-    mapM_ (flip writeSTRef 0 . snd) inps
+    prompt tag $ flip writeBRef' 1 =<< toDzi tag
+    ans <- mapM (readBRefDefault 0 . snd) inps
+    mapM_ (flip writeBRef' 0 . snd) inps
     pure ans
