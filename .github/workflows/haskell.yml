@@ -86,13 +86,10 @@ jobs:
     - name: Run Bench
       env: 
         BENCHMARK: bins/bin/ad-delcont-primop-bench
+        RESULTS: bench-results
+      shell: bash
       run: |
-        rm -rf bench-results
-        mkdir -p bench-results
-        ${{ env.BENCHMARK }} -l \
-          | cut -d. -f2 | uniq | while read -r GROUP; do
-            ${{ env.BENCHMARK }} -j1 -p "/All.${GROUP}/" --csv bench-results/${GROUP}.csv --svg bench-results/${GROUP}.svg
-        done
+        ./scripts/run-bench.sh "${{ env.BENCHMARK }}"
         tar -cf bench-results.tar.zst --use-compress-program="zstdmt -9" bench-results
     - name: Upload Bench Results
       uses: actions/upload-artifact@v3
