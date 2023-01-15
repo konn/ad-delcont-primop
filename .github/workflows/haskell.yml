@@ -3,6 +3,7 @@ on: push
 
 jobs:
   build:
+    name: Build
     runs-on: ubuntu-22.04
     env:
       ARTIFACT: ${{github.workspace}}/artifacts.tar.zst
@@ -49,9 +50,9 @@ jobs:
         chmod +x cabal-plan
         BIN_DIR=bins
         mkdir -p ${BIN_DIR}/bin
-        ./cabal-plan \
+        ./cabal-plan list-bins \
           --hide-global --hide-setup --hide-builtin | \
-          grep :bench:  | awk '{ print $2 }' | \
+          grep -e :test: -e :bench: | awk '{ print $2 }' | \
           while read -r FILE; do basename "${FILE}"; done > "${BIN_DIR}/bench.txt"
         
         ./cabal-plan list-bins \
