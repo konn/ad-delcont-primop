@@ -20,5 +20,12 @@ main =
         [ $(mkGradBench [|\(V2 x y) -> x * y|] [|V2 (42 :: Double) 53|])
         , $(mkGradBench [|\(V2 x y) -> sin x * cos y * (x ^ 2 + y)|] [|V2 42 54|])
         , $(mkGradBench [|\(V2 x y) -> y * exp (x * x + y)|] [|V2 42 52|])
+        , $(mkGradBench [|\(V2 x y) -> (x * cos x + y) ^ 2 * exp (x * sin (x + y * y + 1))|] [|V2 42 52|])
+        , $(mkGradBench [|\(V2 x y) -> (tanh (exp y * cosh x) + x ^ 2) ^ 3 - (x * cos x + y) ^ 2 * exp (x * sin (x + y * y + 1))|] [|V2 42 52|])
+        ]
+    , bgroup
+        "trivariate"
+        [ $(mkGradBench [|\(V3 x y z) -> x * y * z|] [|V3 4 5 6|])
+        , $(mkGradBench [|\(V3 x y z) -> (tanh (exp (y + z ^ 2) * cosh x) + x ^ 2) ^ 3 - (x * (z ^ 2 - 1) * cos x + y) ** (2 * z) * exp (x * sin (x + y * z * x + 1))|] [|V3 4 5 6|])
         ]
     ]
