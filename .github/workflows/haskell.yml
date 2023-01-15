@@ -50,13 +50,11 @@ jobs:
         chmod +x cabal-plan
         BIN_DIR=bins
         mkdir -p ${BIN_DIR}/bin
-        ./cabal-plan list-bins \
-          --hide-global --hide-setup --hide-builtin | \
+        ./cabal-plan list-bins  | \
           grep -e :test: -e :bench: | awk '{ print $2 }' | \
           while read -r FILE; do basename "${FILE}"; done > "${BIN_DIR}/bench.txt"
         
         ./cabal-plan list-bins \
-          --hide-global --hide-setup --hide-builtin \
           | grep ad-delcont-primop | awk '{ print $2 }' | while read -r BIN; do
           strip "${BIN}"
           cp "${BIN}" "${BIN_DIR}/bin/"
