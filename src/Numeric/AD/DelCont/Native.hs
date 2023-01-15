@@ -4,14 +4,20 @@
 
 module Numeric.AD.DelCont.Native (
   AD',
+  AD,
   eval,
   konst,
+  konst',
   diff,
   grad,
+  jacobian,
   op1,
+  op1',
   op2,
+  op2',
 ) where
 
+import Control.Monad
 import Control.Monad.ST.Strict
 import Data.Bifoldable
 import Data.Bifunctor
@@ -21,6 +27,8 @@ import GHC.Generics
 import Numeric.AD.DelCont.Native.Internal
 
 data AD' s a da = AD {primal :: !a, dual :: !(PromptTag () -> ST s (STRef s da))}
+
+type AD s a = AD' s a a
 
 data a :!: b = !a :!: !b
   deriving (Show, Eq, Ord, Generic, Functor, Foldable, Traversable)
@@ -36,21 +44,25 @@ instance Bifoldable (:!:) where
   bifoldMap = bifoldMapDefault
   {-# INLINE bifoldMap #-}
 
-withdiff :: Num a => PromptTag () -> (a -> ST s ()) -> ST s (STRef s a)
-{-# INLINE withdiff #-}
-withdiff tag f = shift tag $ \k -> do
-  bx <- newSTRef 0
+withGrad' :: a -> PromptTag () -> (a -> ST s ()) -> ST s (STRef s a)
+{-# INLINE withGrad' #-}
+withGrad' zero tag f = shift tag $ \k -> do
+  bx <- newSTRef zero
   k (pure bx)
   f =<< readSTRef bx
 
 op1 :: (Num da, Num db) => (a -> (b, db -> da)) -> AD' s a da -> AD' s b db
 {-# INLINE op1 #-}
-op1 f (AD x toDx) =
+op1 = op1' 0 (+)
+
+op1' :: db -> (da -> da -> da) -> (a -> (b, db -> da)) -> AD' s a da -> AD' s b db
+{-# INLINE op1' #-}
+op1' zerodb addda f (AD x toDx) =
   let (!fx, !deriv) = f x
    in AD fx $ \tag -> do
         dx <- toDx tag
-        withdiff tag $ \dc ->
-          modifySTRef' dx (+ deriv dc)
+        withGrad' zerodb tag $ \dc ->
+          modifySTRef' dx (`addda` deriv dc)
 
 op2 ::
   (Num da, Num db, Num dc) =>
@@ -58,17 +70,30 @@ op2 ::
   AD' s a da ->
   AD' s b db ->
   AD' s c dc
-op2 f (AD x toDx) (AD y toDy) =
+op2 = op2' 0 (+) (+)
+
+op2' ::
+  dc ->
+  (da -> da -> da) ->
+  (db -> db -> db) ->
+  (a -> b -> (c, dc -> da, dc -> db)) ->
+  AD' s a da ->
+  AD' s b db ->
+  AD' s c dc
+op2' zeroDc addDa addDb f (AD x toDx) (AD y toDy) =
   let (!fx, !derivX, !derivY) = f x y
    in AD fx $ \tag -> do
         dx <- toDx tag
         dy <- toDy tag
-        withdiff tag $ \dc -> do
-          modifySTRef' dx (+ derivX dc)
-          modifySTRef' dy (+ derivY dc)
+        withGrad' zeroDc tag $ \dc -> do
+          modifySTRef' dx (`addDa` derivX dc)
+          modifySTRef' dy (`addDb` derivY dc)
 
 konst :: Num da => a -> AD' s a da
-konst = flip AD (const $ newSTRef 0)
+konst = konst' 0
+
+konst' :: da -> a -> AD' s a da
+konst' zeroDa = flip AD (const $ newSTRef zeroDa)
 
 instance (Num a, a ~ b) => Num (AD' s a b) where
   fromInteger = konst . fromInteger
@@ -137,6 +162,7 @@ getDual :: PromptTag () -> AD' s a da -> ST s (STRef s da)
 getDual tag = ($ tag) . dual
 
 diff :: (Num da, Num db) => (forall s. AD' s a da -> AD' s b db) -> a -> da
+{-# INLINE diff #-}
 diff op a = runST $ do
   ref <- newSTRef 0
   tag <- newPromptTag
@@ -150,10 +176,27 @@ grad ::
   (forall s. t (AD' s a da) -> AD' s b db) ->
   t a ->
   t da
+{-# INLINE grad #-}
 grad f xs = runST $ do
   inps <- mapM (\a -> (a,) <$> newSTRef 0) xs
   tag <- newPromptTag
   prompt tag $ do
-    db <- getDual tag (f $ fmap (\(a, ref) -> AD a $ const $ pure ref) inps)
+    db <- getDual tag $ f $ fmap (\(a, ref) -> AD a $ const $ pure ref) inps
     writeSTRef db 1
   mapM (readSTRef . snd) inps
+
+jacobian ::
+  (Num da, Num db, Traversable t, Traversable g) =>
+  (forall s. t (AD' s a da) -> g (AD' s b db)) ->
+  t a ->
+  g (t da)
+{-# INLINE jacobian #-}
+jacobian f xs = runST $ do
+  inps <- mapM (\a -> (a,) <$> newSTRef 0) xs
+  let duals = fmap dual $ f $ fmap (\(a, ref) -> AD a $ const $ pure ref) inps
+  forM duals $ \toDzi -> do
+    tag <- newPromptTag
+    prompt tag $ flip writeSTRef 1 =<< toDzi tag
+    ans <- mapM (readSTRef . snd) inps
+    mapM_ (flip writeSTRef 0 . snd) inps
+    pure ans

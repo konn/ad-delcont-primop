@@ -4,9 +4,17 @@
     "stack": null,
     "cabal": null
   },
+  "[cabal]": {
+    "editor.defaultFormatter": "berberman.vscode-cabal-fmt"
+  },
   "[haskell]": {
     "editor.defaultFormatter": "sjurmillidahl.ormolu-vscode"
   },
   "ormolu.path": "fourmolu",
-  "ormolu.args": ["--stdin-input-file", "."]
+  "ormolu.args": ["--stdin-input-file", "."],
+  "ghcSimple.flag.noNotifySlowRangeType": true,
+  "scm.defaultViewMode": "tree",
+  "scm.diffDecorationsGutterPattern": {
+    "added": true
+  }
 }

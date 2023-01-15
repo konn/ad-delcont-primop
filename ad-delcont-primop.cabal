@@ -29,17 +29,21 @@ common commons
   default-language: GHC2021
   other-modules:    Paths_ad_delcont_primop
   build-depends:
-    , base      >=4.7 && <5
+    , base            >=4.7 && <5
     , ghc-prim
     , linear
     , simple-reflect
 
 library
   import:           commons
-  exposed-modules:  Numeric.AD.DelCont.Native
+  exposed-modules:
+    Numeric.AD.DelCont.Native
+    Numeric.AD.DelCont.Native.Linear
+
   other-modules:    Numeric.AD.DelCont.Native.Internal
   hs-source-dirs:   src
   build-depends:
+    , distributive
     , primitive
     , vector
 
