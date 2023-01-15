@@ -5,7 +5,7 @@ rm -rf bench-results
 mkdir -p bench-results
 BENCH="${1:-$(cabal list-bin ad-delcont-primop-bench)}"
 
-"${BENCH}" -l -p /4-ary/ | cut -d. -f2 | uniq | while read -r GROUP; do
+"${BENCH}" -l | cut -d. -f2 | uniq | while read -r GROUP; do
   GROUP_DIR="bench-results/${GROUP}"
   mkdir -p "${GROUP_DIR}"
   I=0
