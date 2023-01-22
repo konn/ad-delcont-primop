@@ -16,5 +16,6 @@
   "scm.defaultViewMode": "tree",
   "scm.diffDecorationsGutterPattern": {
     "added": true
-  }
+  },
+  "ghcSimple.replLinger": false
 }

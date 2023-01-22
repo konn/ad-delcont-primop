@@ -4,8 +4,7 @@
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Numeric.AD.DelCont.Native.MultiPrompt (
-  AD',
+module Numeric.AD.DelCont.Native.MultiPrompt.Double (
   AD,
   eval,
   konst,
@@ -23,19 +22,17 @@ import Data.Bifoldable
 import Data.Bitraversable
 import Data.Function (on)
 import Data.Ord (comparing)
-import Data.STRef
+import Data.PRef
 import GHC.Generics
 import Numeric.AD.DelCont.Native.Internal
 
-data AD' s a da = AD {primal :: !a, dual :: !(PromptTag da -> ST s ())}
+data AD s = AD {primal :: {-# UNPACK #-} !Double, dual :: !(PromptTag Double -> ST s ())}
 
-type AD s a = AD' s a a
-
-instance Eq a => Eq (AD' s a da) where
+instance Eq (AD s) where
   (==) = (==) `on` primal
   {-# INLINE (==) #-}
 
-instance Ord a => Ord (AD' s a da) where
+instance Ord (AD s) where
   compare = comparing primal
   {-# INLINE compare #-}
   (<) = (<) `on` primal
@@ -65,7 +62,7 @@ instance Bifoldable (:!:) where
   bifoldMap = bifoldMapDefault
   {-# INLINE bifoldMap #-}
 
-op1 :: (a -> (b, db -> da)) -> AD' s a da -> AD' s b db
+op1 :: (Double -> (Double, Double -> Double)) -> AD s -> AD s
 {-# INLINE op1 #-}
 op1 f (AD x toDx) =
   let (!fx, !deriv) = f x
@@ -77,10 +74,10 @@ op1 f (AD x toDx) =
         pure dy
 
 op2 ::
-  (a -> b -> (c, dc -> da, dc -> db)) ->
-  AD' s a da ->
-  AD' s b db ->
-  AD' s c dc
+  (Double -> Double -> (Double, Double -> Double, Double -> Double)) ->
+  AD s ->
+  AD s ->
+  AD s
 op2 f (AD x getDx) (AD y getDy) =
   let (!fx, !derivX, !derivY) = f x y
    in AD fx $ \tag -> do
@@ -94,10 +91,10 @@ op2 f (AD x getDx) (AD y getDy) =
             pure $! derivY dz
           pure dz
 
-konst :: a -> AD' s a da
+konst :: Double -> AD s
 konst = flip AD (const $ pure ())
 
-instance (Num a, a ~ b) => Num (AD' s a b) where
+instance Num (AD s) where
   fromInteger = konst . fromInteger
   {-# INLINE fromInteger #-}
   signum = op1 $ \c -> (signum c, const 0)
@@ -113,7 +110,7 @@ instance (Num a, a ~ b) => Num (AD' s a b) where
   (*) = op2 $ \a b -> (a * b, (* b), (a *))
   {-# INLINE (*) #-}
 
-instance (Fractional a, a ~ b) => Fractional (AD' s a b) where
+instance Fractional (AD s) where
   fromRational = konst . fromRational
   {-# INLINE fromRational #-}
   recip = op1 $ \x -> (recip x, negate . (/ (x * x)))
@@ -121,7 +118,7 @@ instance (Fractional a, a ~ b) => Fractional (AD' s a b) where
   (/) = op2 $ \x y -> (x / y, (/ y), (* (-x / (y * y))))
   {-# INLINE (/) #-}
 
-instance (Floating a, a ~ b) => Floating (AD' s a b) where
+instance Floating (AD s) where
   pi = konst pi
   {-# INLINE pi #-}
   exp = op1 $ \x -> (exp x, (exp x *))
@@ -161,15 +158,15 @@ instance (Floating a, a ~ b) => Floating (AD' s a b) where
   atanh = op1 $ \x -> (atanh x, (/ (1 - x * x)))
   {-# INLINE atanh #-}
 
-eval :: (forall s. AD' s a da -> AD' s b db) -> a -> b
+eval :: (forall s. AD s -> AD s) -> Double -> Double
 {-# INLINE eval #-}
 eval op = primal . op . konst
 
-toDual :: PromptTag da -> AD' s a da -> ST s ()
+toDual :: PromptTag Double -> AD s -> ST s ()
 {-# INLINE toDual #-}
 toDual tag = ($ tag) . dual
 
-diff :: forall a da b db. (Num da, Num db) => (forall s. AD' s a da -> AD' s b db) -> a -> da
+diff :: (forall s. AD s -> AD s) -> Double -> Double
 {-# INLINE diff #-}
 diff op a = runST $ do
   reset $ \sumTag -> do
@@ -182,40 +179,28 @@ diff op a = runST $ do
     void $ reset $ \tag -> 1 <$ toDual tag bdb
     pure 0
 
-collectVar :: (Foldable t, Applicative t) => t (AD' s a da) -> AD' s (t a) (t da)
-{-# INLINE collectVar #-}
-collectVar ads =
-  AD (fmap primal ads) $ \tag -> do
-    control0 tag $ \k -> do
-      !das <- k $! pure ()
-      forM_ ((,) <$> das <*> ads) $ \(x, AD _ toD) -> do
-        reset $ \aTag -> do
-          toD aTag
-          pure x
-      pure das
-
 grad ::
-  (Num da, Num db, Traversable t) =>
-  (forall s. t (AD' s a da) -> AD' s b db) ->
-  t a ->
-  t da
+  (Traversable t) =>
+  (forall s. t (AD s) -> AD s) ->
+  t Double ->
+  t Double
 {-# INLINE grad #-}
 grad f xs = runST $ do
-  refs <- mapM (\a -> (:!: a) <$> newSTRef 0) xs
+  refs <- mapM (\a -> (:!: a) <$> newPRef 0) xs
   let bdb =
         f $
           refs <&> \(ref :!: a) -> AD a $ \tagDa -> control0 tagDa $ \k -> do
             !val <- k $! pure ()
-            modifySTRef' ref (+ val)
+            modifyPRef' ref (+ val)
             pure val
   void $ reset $ \tag -> 1 <$ toDual tag bdb
-  mapM (readSTRef . fst') refs
+  mapM (readPRef . fst') refs
 
 {-
 
 jacobian ::
   (Num da, Num db, Traversable t, Traversable g) =>
-  (forall s. t (AD' s a da) -> g (AD' s b db)) ->
+  (forall s. t (AD s) -> g (AD s)) ->
   t a ->
   g (t da)
 {-# INLINE jacobian #-}

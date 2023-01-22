@@ -1,3 +1,4 @@
+{-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE PartialTypeSignatures #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# OPTIONS_GHC -Wno-type-defaults -Wno-partial-type-signatures #-}
@@ -15,6 +16,7 @@ main =
         [ $(mkDiffBench [|id|])
         , $(mkDiffBench [|\x -> (x + 1) * (x + 1)|])
         , $(mkDiffBench [|\x -> x * exp (x * x + 1)|])
+        , $(mkDiffBench [|\x -> let {-# NOINLINE xx #-}; xx = x + (x * sin x) in sin (xx * xx)|])
         ]
     , bgroup
         "bivariate"
@@ -23,6 +25,13 @@ main =
         , $(mkGradBench [|\(V2 x y) -> y * exp (x * x + y)|] [|V2 42 52|])
         , $(mkGradBench [|\(V2 x y) -> (x * cos x + y) ^ 2 * exp (x * sin (x + y * y + 1))|] [|V2 42 52|])
         , $(mkGradBench [|\(V2 x y) -> (tanh (exp y * cosh x) + x ^ 2) ^ 3 - (x * cos x + y) ^ 2 * exp (x * sin (x + y * y + 1))|] [|V2 42 52|])
+        , $( mkGradBench
+              [|
+                \(V2 x y) ->
+                  let !xPlusy = x + y in xPlusy * xPlusy + xPlusy
+                |]
+              [|V2 42 (45 :: Double)|]
+           )
         ]
     , bgroup
         "trivariate"

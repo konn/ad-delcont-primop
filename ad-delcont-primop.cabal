@@ -29,10 +29,20 @@ common commons
   default-language: GHC2021
   other-modules:    Paths_ad_delcont_primop
   build-depends:
+    , ad
+    , adjunctions
+    , backprop
     , base            >=4.7 && <5
+    , deepseq
+    , foldl
     , ghc-prim
+    , lens
     , linear
+    , QuickCheck
+    , random
+    , reflection
     , simple-reflect
+    , vector
 
 library
   import:           commons
@@ -43,10 +53,26 @@ library
     Numeric.AD.DelCont.Native.Double
     Numeric.AD.DelCont.Native.Linear
     Numeric.AD.DelCont.Native.MultiPrompt
+    Numeric.AD.DelCont.Native.MultiPrompt.Double
 
   other-modules:    Numeric.AD.DelCont.Native.Internal
   hs-source-dirs:   src
   build-depends:
+    , distributive
+    , primitive
+    , vector
+
+  default-language: Haskell2010
+
+library ad-delcont-primop-internal
+  import:           commons
+  exposed-modules:
+    Helpers
+    LargeCase
+
+  hs-source-dirs:   internal
+  build-depends:
+    , ad-delcont-primop
     , distributive
     , primitive
     , vector
@@ -78,18 +104,34 @@ benchmark ad-delcont-primop-bench
   import:         commons
   type:           exitcode-stdio-1.0
   main-is:        bench.hs
-  other-modules:
-    Helpers
-    Macros
-
+  other-modules:  Macros
   hs-source-dirs: bench
   ghc-options:    "-with-rtsopts=-A32m -T"
   build-depends:
     , ad
     , ad-delcont
     , ad-delcont-primop
+    , ad-delcont-primop-internal
     , backprop
-    , lens
+    , tasty
+    , tasty-bench
+    , tasty-hunit
+    , tasty-quickcheck
+    , template-haskell
+
+benchmark small-nn-bench
+  import:         commons
+  type:           exitcode-stdio-1.0
+  main-is:        small-nn-bench.hs
+  other-modules:  Macros
+  hs-source-dirs: bench
+  ghc-options:    "-with-rtsopts=-A32m -T"
+  build-depends:
+    , ad
+    , ad-delcont
+    , ad-delcont-primop
+    , ad-delcont-primop-internal
+    , backprop
     , tasty
     , tasty-bench
     , tasty-hunit

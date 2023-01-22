@@ -19,11 +19,29 @@ import Control.Monad.ST.Strict
 import Data.Bifoldable
 import Data.Bifunctor
 import Data.Bitraversable
+import Data.Function (on)
+import Data.Ord (comparing)
 import Data.PRef
 import GHC.Generics
 import Numeric.AD.DelCont.Native.Internal
 
 data ADDouble s = AD {primal :: !Double, dual :: !(PromptTag () -> ST s (PRef s Double))}
+
+instance Eq (ADDouble s) where
+  (==) = (==) `on` primal
+  {-# INLINE (==) #-}
+
+instance Ord (ADDouble s) where
+  compare = comparing primal
+  {-# INLINE compare #-}
+  (<) = (<) `on` primal
+  {-# INLINE (<) #-}
+  (<=) = (<=) `on` primal
+  {-# INLINE (<=) #-}
+  (>) = (>) `on` primal
+  {-# INLINE (>) #-}
+  (>=) = (>=) `on` primal
+  {-# INLINE (>=) #-}
 
 data a :!: b = !a :!: !b
   deriving (Show, Eq, Ord, Generic, Functor, Foldable, Traversable)

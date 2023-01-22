@@ -22,11 +22,29 @@ import Control.Monad.ST.Strict
 import Data.Bifoldable
 import Data.Bifunctor
 import Data.Bitraversable
+import Data.Function (on)
+import Data.Ord (comparing)
 import Data.STRef
 import GHC.Generics
 import Numeric.AD.DelCont.Native.Internal
 
 data AD' s a da = AD {primal :: !a, dual :: !(PromptTag () -> ST s (STRef s da))}
+
+instance Ord a => Eq (AD' s a da) where
+  (==) = (==) `on` primal
+  {-# INLINE (==) #-}
+
+instance Ord a => Ord (AD' s a da) where
+  compare = comparing primal
+  {-# INLINE compare #-}
+  (<) = (<) `on` primal
+  {-# INLINE (<) #-}
+  (<=) = (<=) `on` primal
+  {-# INLINE (<=) #-}
+  (>) = (>) `on` primal
+  {-# INLINE (>) #-}
+  (>=) = (>=) `on` primal
+  {-# INLINE (>=) #-}
 
 type AD s a = AD' s a a
 
