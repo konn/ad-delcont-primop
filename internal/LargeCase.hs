@@ -106,15 +106,15 @@ data Network1 a = Network1
   , layer3 :: !(V 10 (V 16 a))
   }
   deriving (Show, Functor, Foldable, Traversable, Generic, Generic1)
-  deriving anyclass (Representable, NFData)
+  deriving anyclass (Representable, NFData, Metric, Additive)
   deriving (Applicative) via Co Network1
 
-calcNetwork1 :: (Ord a, Floating a, LiftDouble a) => Network1 Double -> V 128 a -> V 10 a
+calcNetwork1 :: (Ord a, Floating a, LiftDouble a) => Network1 a -> V 128 Double -> V 10 a
 {-# INLINE calcNetwork1 #-}
 calcNetwork1 Network1 {..} inp =
-  let !v32 = relu <$> fmap (fmap liftDouble) layer1 !* inp
-      !v16 = tanh <$> fmap (fmap liftDouble) layer2 !* v32
-   in softmax $ fmap (fmap liftDouble) layer3 !* v16
+  let !v32 = relu <$> layer1 !* fmap liftDouble inp
+      !v16 = sigmoid <$> layer2 !* v32
+   in softmax $ layer3 !* v16
 
 class LiftDouble d where
   liftDouble :: Double -> d
@@ -147,8 +147,13 @@ instance LiftDouble (MPDouble.AD s) where
   liftDouble = MPDouble.konst
   {-# INLINE liftDouble #-}
 
-calcLossNN1 :: (Ord a, Floating a, LiftDouble a) => Network1 Double -> V 10 Double -> V 128 a -> a
-calcLossNN1 nn ans = \inp ->
+calcLossNN1 ::
+  (Ord a, Floating a, LiftDouble a) =>
+  V 128 Double ->
+  V 10 Double ->
+  Network1 a ->
+  a
+calcLossNN1 inp ans = \nn ->
   crossEntropy (calcNetwork1 nn inp) (liftDouble <$> ans)
 
 instance Distributive Network1 where

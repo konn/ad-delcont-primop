@@ -21,32 +21,16 @@ main =
         bgroup
           "small-nn"
           [ localOption (QuickCheckTests 10) $
-              testProperty "primop almost coincides with ad/double" $
+              testProperty "primop/mp/double almost coincides with ad/double" $
                 \nn1 (Image img1) (Digit ans1) ->
-                  let !ad = ADDouble.grad (calcLossNN1 nn1 ans1) img1
-                      !preds = PrimOp.grad (calcLossNN1 nn1 ans1) img1
+                  let !ad = ADDouble.grad (calcLossNN1 img1 ans1) nn1
+                      !preds = MPDouble.grad (calcLossNN1 img1 ans1) nn1
                    in ad ==~ preds
-          , localOption (QuickCheckTests 10) $
-              testProperty "primop/double almost coincides with ad/double" $
-                \nn1 (Image img1) (Digit ans1) ->
-                  let !ad = ADDouble.grad (calcLossNN1 nn1 ans1) img1
-                      !preds = PrimOpDouble.grad (calcLossNN1 nn1 ans1) img1
-                   in ad ==~ preds
-          , testProperty "primop/mp almost coincides with ad/double" $
-              \nn1 (Image img1) (Digit ans1) ->
-                let !ad = ADDouble.grad (calcLossNN1 nn1 ans1) img1
-                    !preds = MP.grad (calcLossNN1 nn1 ans1) img1
-                 in ad ==~ preds
-          , testProperty "primop/mp/double almost coincides with ad/double" $
-              \nn1 (Image img1) (Digit ans1) ->
-                let !ad = ADDouble.grad (calcLossNN1 nn1 ans1) img1
-                    !preds = MPDouble.grad (calcLossNN1 nn1 ans1) img1
-                 in ad ==~ preds
-          , bench "ad" $ nf (AD.grad $ calcLossNN1 nn a1) img
-          , bench "ad/double" $ nf (ADDouble.grad $ calcLossNN1 nn a1) img
-          , bench "primop" $ nf (PrimOp.grad $ calcLossNN1 nn a1) img
-          , bench "primop/double" $ nf (PrimOpDouble.grad $ calcLossNN1 nn a1) img
-          , bench "primop/mp" $ nf (MP.grad $ calcLossNN1 nn a1) img
-          , bench "primop/mp/double" $ nf (MPDouble.grad $ calcLossNN1 nn a1) img
+          , bench "ad" $ nf (AD.grad $ calcLossNN1 img a1) nn
+          , bench "ad/double" $ nf (ADDouble.grad $ calcLossNN1 img a1) nn
+          , bench "primop" $ nf (PrimOp.grad $ calcLossNN1 img a1) nn
+          , bench "primop/double" $ nf (PrimOpDouble.grad $ calcLossNN1 img a1) nn
+          , bench "primop/mp" $ nf (MP.grad $ calcLossNN1 img a1) nn
+          , bench "primop/mp/double" $ nf (MPDouble.grad $ calcLossNN1 img a1) nn
           ]
     ]
