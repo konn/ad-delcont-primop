@@ -49,21 +49,21 @@ import Test.QuickCheck
 
 type ComposedV128 = (Compose V4 V4) `Compose` (Compose V4 V4)
 
-func1Seed :: Floating a => V4 a -> a
+func1Seed :: Floating a => Compose V4 V4 a -> a
 {-# INLINE func1Seed #-}
-func1Seed = \(V4 x y z w) ->
-  logBase (x ^ (2 :: Int) + tanh w) (cos (x * x + 2 * z) + w + 1) ^ (4 :: Int)
-    + exp (x + sin (pi * x + w ^ 2) * cosh (exp y ^ 2 * sin z) ^ (2 :: Int) * (w + 1))
+func1Seed = \(Compose (V4 (V4 x1 x2 x3 x4) (V4 y1 y2 y3 y4) (V4 z1 z2 z3 z4) (V4 w1 w2 w3 w4))) ->
+  logBase
+    (x1 * x2 * x3 * x4 + sin (w1 + w2 + w3 * w4))
+    (cos (x1 * y2 * z3 * w4 + 2 * z1 * z2 * z3 * z4) + y1 + y3 * y4 * w1 + 1)
+    ^ (4 :: Int)
+    + exp (x2 * z1 + sin (2 * pi * (x1 + y2 + z3 + w4)))
+    + (x1 * w2 * z3 * y4 + (w1 * w2 * w3 * w4) ^ 2) * cosh ((exp (y1 * y2 * y3 + y4)) ^ (2 :: Int) * sin (z1 * z2 + z3 * z4)) ^ (2 :: Int) * (w1 * w2 * w3 * w4 * z3 + 1)
 
 largeFunc1 :: Floating a => ComposedV128 a -> a
 {-# INLINE largeFunc1 #-}
 largeFunc1 =
   func1Seed
     . fmap func1Seed
-    . getCompose
-    . fmap func1Seed
-    . fmap func1Seed
-    . fmap getCompose
     . getCompose
 
 type V64 = V 64

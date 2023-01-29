@@ -119,10 +119,10 @@ benchmark ad-delcont-primop-bench
     , tasty-quickcheck
     , template-haskell
 
-benchmark small-nn-bench
+benchmark ad-large-scale-bench
   import:         commons
   type:           exitcode-stdio-1.0
-  main-is:        small-nn-bench.hs
+  main-is:        large-scale-bench.hs
   other-modules:  Macros
   hs-source-dirs: bench
   ghc-options:    "-with-rtsopts=-A32m -T"

@@ -115,38 +115,15 @@ mkGradBench' func = do
       env (pure (arg0 :: _ Double)) $ \arg ->
         bgroup
           lab
-          [ testProperty "ad and primops returns almost the same answer" $
-              \(x :: _ Double) ->
-                let ad = AD.grad $(func) x
-                    primop =
-                      PrimOp.grad
-                        ($func :: _ (PrimOp.AD s Double) -> PrimOp.AD s Double)
-                        x
-                 in classify (any (not . isDefinite) ad) "diverged" $ ad ==~ primop
-          , testProperty "ad and primops/mp returns almost the same answer" $
-              \(x :: _ Double) ->
-                let ad = AD.grad $(func) x
-                    primop =
-                      MP.grad
-                        ($func :: _ (MP.AD s Double) -> MP.AD s Double)
-                        x
-                 in classify (any (not . isDefinite) ad) "diverged" $ ad ==~ primop
-          , testProperty "ad/double and primops/mp/double returns almost the same answer" $
+          [ testProperty "ad/double and primops/mp/double returns almost the same answer" $
               \(x :: _ Double) ->
                 let ad = AD.grad $(func) x
                     primop = MP.grad $func x
                  in classify (any (not . isDefinite) ad) "diverged" $ ad ==~ primop
-          , testProperty "ad/double and primops/double returns almost the same answer" $
-              \(x :: _ Double) ->
-                let ad = AD.grad $(func) x
-                    primop = PrimOpDouble.grad $(func) x
-                 in classify (any (not . isDefinite) ad) "diverged" $ ad ==~ primop
           , bench "transformers" $ nf (snd . MTL.grad $func) arg
-          , bench "ad" $ nf (AD.grad $func) arg
           , bench "ad/double" $ nf (ADDouble.grad $func) arg
           , bench "backprop" $ nf (BP.gradBP ($func . BP.sequenceVar)) arg
           , bench "primops" $ nf (PrimOp.grad ($func :: _ (PrimOp.AD s Double) -> PrimOp.AD s Double)) arg
-          , bench "primops/double" $ nf (PrimOpDouble.grad $func) arg
           , bench "primops/mp" $ nf (MP.grad ($func :: _ (MP.AD s Double) -> MP.AD s Double)) arg
           , bench "primops/mp/double" $ nf (MPDouble.grad $func) arg
           ]

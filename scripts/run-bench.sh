@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
-rm -rf bench-results
-mkdir -p bench-results
 BENCH="${1:-$(cabal list-bin ad-delcont-primop-bench)}"
+RESULTS="${2:-bench-results}"
+rm -rf "${RESULTS}"
+mkdir -p "${RESULTS}"
 
 "${BENCH}" -l | cut -d. -f2 | uniq | while read -r GROUP; do
-  GROUP_DIR="bench-results/${GROUP}"
+  GROUP_DIR="${RESULTS}/${GROUP}"
   mkdir -p "${GROUP_DIR}"
   I=0
   "${BENCH}" -l -p "\$2 == \"${GROUP}\"" | cut -d. -f3 | uniq | while read -r CASE; do

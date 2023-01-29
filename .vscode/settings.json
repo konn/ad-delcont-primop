@@ -17,5 +17,6 @@
   "scm.diffDecorationsGutterPattern": {
     "added": true
   },
-  "ghcSimple.replLinger": false
+  "ghcSimple.replLinger": false,
+  "ghcSimple.replCommand": "cabal v2-repl lib:ad-delcont-primop"
 }

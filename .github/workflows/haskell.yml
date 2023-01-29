@@ -54,6 +54,8 @@ jobs:
     needs: build
     name: Test and Bench
     runs-on: ubuntu-22.04
+    env: 
+      RESULTS: bench-results
     steps:
     - name: Checkout
       uses: actions/checkout@v3
@@ -70,13 +72,44 @@ jobs:
     - name: Run Bench
       env: 
         BENCHMARK: bins/bin/ad-delcont-primop-bench
-        RESULTS: bench-results
       shell: bash
       run: |
-        ./scripts/run-bench.sh "${{ env.BENCHMARK }}"
-        tar -cf bench-results.tar.zst --use-compress-program="zstdmt -9" bench-results
+        ./scripts/run-bench.sh "${{ env.BENCHMARK }}" "${{ env.RESULTS }}"
+        tar -cf "${{env.RESULTS}}".tar.zst --use-compress-program="zstdmt -9" "${{env.RESULTS}}"
     - name: Upload Bench Results
       uses: actions/upload-artifact@v3
       with:
-        name: bench-results
-        path: bench-results.tar.zst
+        name: ${{env.RESULTS}}
+        path: ${{env.RESULTS}}.tar.zst
+
+  large-bench:
+    needs: build
+    name: Large-Scale Benchmarks
+    runs-on: ubuntu-22.04
+    env: 
+      RESULTS: bench-results
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Download Artifact
+      id: download
+      uses: actions/download-artifact@v3
+      with: 
+        name: binaries
+    - name: Decompress
+      run: |
+        echo ${{ steps.download.outputs.download-path }}
+        ls ${{ steps.download.outputs.download-path }}
+        tar xvf ${{ steps.download.outputs.download-path }}/artifacts.tar.zst --directory=.
+    - name: Run Bench
+      env: 
+        BENCHMARK: bins/bin/ad-large-scale-bench
+      shell: bash
+      run: |
+        ./scripts/run-bench.sh "${{ env.BENCHMARK }}" "${{env.RESULTS}}"
+        tar -cf "${{env.RESULTS}}".tar.zst --use-compress-program="zstdmt -9" "${{env.RESULTS}}"
+    - name: Upload Bench Results
+      uses: actions/upload-artifact@v3
+      with:
+        name: "${{env.RESULTS}}"
+        path: "${{env.RESULTS}}.tar.zst"
