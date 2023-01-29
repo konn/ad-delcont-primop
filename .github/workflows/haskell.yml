@@ -87,7 +87,7 @@ jobs:
     name: Large-Scale Benchmarks
     runs-on: ubuntu-22.04
     env: 
-      RESULTS: bench-results
+      RESULTS: large-bench-results
     steps:
     - name: Checkout
       uses: actions/checkout@v3
