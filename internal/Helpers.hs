@@ -8,16 +8,22 @@
 {-# LANGUAGE TypeOperators #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
-module Helpers ((==~), isDefinite) where
+module Helpers ((==~), isDefinite, defaultBenchMainSequential) where
 
 import Control.DeepSeq
 import Data.Foldable
 import Data.Functor.Compose
-import GHC.TypeNats
 import Linear
 import Linear.V
 import qualified Numeric.Backprop as BP
+import System.Exit
+import System.IO
 import Test.QuickCheck
+import Test.Tasty
+import Test.Tasty.Bench
+import Test.Tasty.Ingredients (tryIngredients)
+import Test.Tasty.Options (changeOption, defaultValue)
+import Test.Tasty.Runners (NumThreads (..), installSignalHandlers, parseOptions)
 
 (==~) :: (Show (v Double), Foldable v, Applicative v, Metric v) => v Double -> v Double -> Property
 ls ==~ rs =
@@ -104,3 +110,29 @@ deriving anyclass instance NFData1 V2
 deriving anyclass instance NFData1 V1
 
 deriving newtype instance (Num (u (v a))) => Num (Compose u v a)
+
+defaultBenchMainSequential :: [Benchmark] -> IO ()
+defaultBenchMainSequential benchmarks = do
+  installSignalHandlers
+  let tree = testGroup "All" benchmarks
+  opts <- parseOptions benchIngredients tree
+  let opts' =
+        changeOption
+          ( \i ->
+              if i == defaultValue
+                then NumThreads 1
+                else i
+          )
+          opts
+
+  case tryIngredients benchIngredients opts' tree of
+    Nothing -> do
+      hPutStrLn
+        stderr
+        "No ingredients agreed to run. Something is wrong either with your ingredient set or the options."
+      exitFailure
+    Just act -> do
+      ok <- act
+      if ok
+        then exitSuccess
+        else exitFailure

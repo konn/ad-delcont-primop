@@ -5,13 +5,14 @@
 
 module Main (main) where
 
+import Helpers
 import Linear (V2 (..), V3 (..), V4 (..))
 import Macros
 import Test.Tasty.Bench
 
 main :: IO ()
 main =
-  defaultMain
+  defaultBenchMainSequential
     [ bgroup "univariate" $
         [ $(mkDiffBench [|id|])
         , $(mkDiffBench [|\x -> (x + 1) * (x + 1)|])
